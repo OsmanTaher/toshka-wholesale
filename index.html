@@ -359,7 +359,12 @@
                   <i class="fa-solid fa-truck-fast text-xs text-indigo-500"></i>
                   رسوم التوصيل:
                 </span>
-                <span class="font-bold text-slate-800">+10.00 ج</span>
+                <div class="flex items-center gap-1.5 text-sm">
+                  <span class="font-bold text-slate-800">5 ج.م</span>
+                  <span class="text-xs text-slate-400 line-through"
+                    >15 ج.م</span
+                  >
+                </div>
               </div>
               <div
                 class="border-t border-slate-200 pt-3 flex justify-between items-center text-slate-900"
@@ -368,7 +373,7 @@
                 <span
                   id="totalPrice"
                   class="text-xl font-extrabold text-indigo-600 price-highlight"
-                  >10.00 ج</span
+                  >5 ج</span
                 >
               </div>
             </div>
@@ -455,6 +460,24 @@
                   placeholder="أي تفاصيل خاصة بالطلب أو الموعد..."
                   class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"
                 ></textarea>
+              </div>
+              <!-- صندوق الدفع عند الاستلام المميز -->
+              <div
+                class="mt-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 text-amber-900"
+              >
+                <div
+                  class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 text-amber-700"
+                >
+                  <i class="fa-solid fa-hand-holding-dollar text-base"></i>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-xs font-bold text-amber-950"
+                    >طريقة الدفع</span
+                  >
+                  <span class="text-xs font-medium text-amber-800"
+                    >الدفع عند الاستلام (كاش)</span
+                  >
+                </div>
               </div>
 
               <!-- Submit Button -->

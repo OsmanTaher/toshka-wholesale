@@ -3,7 +3,7 @@ function scrollToTop() {
 }
 
 // Delivery Cost Constant
-const DELIVERY_FEE = 10.0;
+const DELIVERY_FEE = 5;
 
 const products = [
   // 📚 كشاكيل و كراسات
@@ -1002,7 +1002,9 @@ async function handleOrderSubmit(event) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>جاري إرسال الطلب...</span>`;
 
-  // Build Telegram Message (Markdown Formatted)
+  const orderNumber = generateOrderNumber();
+
+  // Build Telegram Message (MarkdownV2 Formatted)
   let subtotal = 0;
   let itemsText = "";
 
@@ -1011,33 +1013,37 @@ async function handleOrderSubmit(event) {
     const qty = cart[id];
     const itemTotal = product.price * qty;
     subtotal += itemTotal;
-    itemsText += `${index + 1}. *${product.name}*\n    └ الكمية: ${qty} | السعر: ${itemTotal.toFixed(2)} ج\n`;
+    itemsText += `${index + 1}\. *${escapeMarkdownV2(product.name)}*\n    └ الكمية: ${qty} \| السعر: ${escapeMarkdownV2(itemTotal.toFixed(2))} ج\n`;
   });
 
   const grandTotal = subtotal + DELIVERY_FEE;
   const currentDate = new Date().toLocaleString("ar-SA");
 
-  const message = `🛍️ *طلب جديد - جملة توشكى*
-----------------------------------
+  const message = `🛍️ *طلب جديد \- جملة توشكى*
+━━━━━━━━━━━━━━━━━━
+
+🔢 *رقم الطلب:* \`${orderNumber}\`
 
 👤 *بيانات العميل:*
-• *الاسم:* ${name}
+• *الاسم:* ${escapeMarkdownV2(name)}
 
-• *الهاتف:* \`${phone}\`
+• *الهاتف:* \`${escapeMarkdownV2(phone)}\`
 
-• *العنوان:* ${address}
-${notes ? `• *ملاحظات:* ${notes}\n` : ""}
+• *العنوان:* ${escapeMarkdownV2(address)}
+${notes ? `• *ملاحظات:* ${escapeMarkdownV2(notes)}\n` : ""}
 📦 *تفاصيل الأدوات المطلوبة:*
 ${itemsText}
 
 💵 *الفاتورة المالية:*
-• *مجموع المنتجات:* ${subtotal.toFixed(2)} جنيه
-• *خدمة التوصيل:* ${DELIVERY_FEE.toFixed(2)} جنيه
+• *مجموع المنتجات:* ${escapeMarkdownV2(subtotal.toFixed(2))} جنيه
+• *خدمة التوصيل:* ${escapeMarkdownV2(DELIVERY_FEE)} جنيه
 
-✨ *الإجمالي المطلوب سداده:* *${grandTotal.toFixed(2)} جنيه*
+✨ *الإجمالي المطلوب سداده:* *${escapeMarkdownV2(grandTotal.toFixed(2))} جنيه*
 
-----------------------------------
-📅 *تاريخ الطلب:* ${currentDate}`;
+━━━━━━━━━━━━━━━━━━
+
+
+📅 *تاريخ الطلب:* ${escapeMarkdownV2(currentDate)}`;
 
   // Send to Telegram API
   const isSuccess = await sendTelegramMessage(message);
@@ -1055,6 +1061,14 @@ ${itemsText}
     // Show Success Modal
     document.getElementById("successModal").classList.remove("hidden");
   }
+}
+
+function generateOrderNumber() {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+function escapeMarkdownV2(value) {
+  return String(value).replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, "\\$1");
 }
 
 // Send API Request to Telegram Bot using ENV variables
