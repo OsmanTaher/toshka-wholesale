@@ -1013,13 +1013,13 @@ async function handleOrderSubmit(event) {
     const qty = cart[id];
     const itemTotal = product.price * qty;
     subtotal += itemTotal;
-    itemsText += `${index + 1}\. *${escapeMarkdownV2(product.name)}*\n    └ الكمية: ${qty} \| السعر: ${escapeMarkdownV2(itemTotal.toFixed(2))} ج\n`;
+    itemsText += `${index + 1}\\. *${escapeMarkdownV2(product.name)}*\n    └ الكمية: ${qty} \\| السعر: ${escapeMarkdownV2(itemTotal.toFixed(2))} ج\n`;
   });
 
   const grandTotal = subtotal + DELIVERY_FEE;
   const currentDate = new Date().toLocaleString("ar-SA");
 
-  const message = `🛍️ *طلب جديد \- جملة توشكى*
+  const message = `🛍️ *طلب جديد \\- جملة توشكى*
 ━━━━━━━━━━━━━━━━━━
 
 🔢 *رقم الطلب:* \`${orderNumber}\`
