@@ -994,10 +994,15 @@ function updateCartUI() {
       .map(
         (item) => `
                     <div class="flex justify-between items-center py-2">
-                        <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-lg object-cover bg-slate-100" onerror="this.onerror=null; this.src='https://placehold.co/80x80/e2e8f0/475569?text=صورة'">
+                        <img src="${item.image}" alt="${item.name}" loading="lazy" onclick="openImageModal(this.src, this.alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') openImageModal(this.src, this.alt)" tabindex="0" role="button" class="w-10 h-10 rounded-lg object-cover bg-slate-100 cursor-zoom-in" onerror="this.onerror=null; this.src='https://placehold.co/80x80/e2e8f0/475569?text=صورة'">
                         <div class="flex-1 pr-1">
                             <p class="font-medium text-slate-800 text-xs line-clamp-1">${item.name}</p>
-                            <p class="text-[10px] text-slate-400">${item.qty} × ${item.price.toFixed(2)} ج</p>
+                        <div class="flex items-center gap-1.5 mt-1">
+                          <button type="button" onclick="changeQty('${item.id}', -1)" aria-label="إنقاص كمية ${item.name}" class="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors font-bold">−</button>
+                          <span class="min-w-5 text-center text-[10px] font-bold text-slate-700">${item.qty}</span>
+                          <button type="button" onclick="changeQty('${item.id}', 1)" aria-label="زيادة كمية ${item.name}" class="w-6 h-6 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors font-bold">+</button>
+                          <span class="text-[10px] text-slate-400">× ${item.price.toFixed(2)} ج</span>
+                        </div>
                         </div>
                         <div class="text-left font-bold text-slate-700 text-xs">
                             ${item.itemTotal.toFixed(2)} ج
@@ -1030,6 +1035,14 @@ async function handleOrderSubmit(event) {
   const phone = document.getElementById("customerPhone").value.trim();
   const address = document.getElementById("customerAddress").value.trim();
   const notes = document.getElementById("customerNotes").value.trim();
+
+  if (!/^01(0|1|2|5)\d{8}$/.test(phone)) {
+    showToast(
+      "أدخل رقم هاتف صحيحًا مكونًا من 11 رقمًا ويبدأ بـ 010 أو 011 أو 012 أو 015",
+      "error",
+    );
+    return;
+  }
 
   const submitBtn = document.getElementById("submitBtn");
   submitBtn.disabled = true;
@@ -1064,6 +1077,7 @@ async function handleOrderSubmit(event) {
 
 • *العنوان:* ${escapeMarkdownV2(address)}
 ${notes ? `• *ملاحظات:* ${escapeMarkdownV2(notes)}\n` : ""}
+
 📦 *تفاصيل الأدوات المطلوبة:*
 ${itemsText}
 
@@ -1092,6 +1106,7 @@ ${itemsText}
     updateCartUI();
 
     // Show Success Modal
+    document.getElementById("successOrderNumber").innerText = orderNumber;
     document.getElementById("successModal").classList.remove("hidden");
   }
 }

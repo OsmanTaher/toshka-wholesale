@@ -325,7 +325,7 @@
 
         <section class="lg:col-span-5">
           <div
-            class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sticky top-24 space-y-6"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sticky top-24 space-y-6 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto"
           >
             <div
               class="flex items-center gap-2 text-slate-900 border-b border-slate-100 pb-3"
@@ -424,7 +424,12 @@
                     type="tel"
                     id="customerPhone"
                     required
+                    pattern="01(0|1|2|5)[0-9]{8}"
+                    minlength="11"
+                    maxlength="11"
+                    inputmode="numeric"
                     placeholder="011xxxxxxxx"
+                    title="أدخل رقم هاتف مكونًا من 11 رقمًا ويبدأ بـ 010 أو 011 أو 012 أو 015"
                     class="w-full pr-10 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left dir-ltr"
                   />
                 </div>
@@ -457,7 +462,7 @@
                 <textarea
                   id="customerNotes"
                   rows="2"
-                  placeholder="أي تفاصيل خاصة بالطلب أو الموعد..."
+                  placeholder="أي تفاصيل خاصة بالطلب أو الموعد أو لون منتج ..."
                   class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"
                 ></textarea>
               </div>
@@ -611,9 +616,12 @@
           <i class="fa-solid fa-check"></i>
         </div>
         <h3 class="text-xl font-bold text-slate-900">تم إرسال طلبك بنجاح!</h3>
+        <p class="text-sm font-bold text-indigo-700">
+          رقم طلبك: <span id="successOrderNumber"></span>
+        </p>
         <p class="text-xs text-slate-500 leading-relaxed">
-          شكراً لك، تم إرسال تفاصيل طلبك بنجاح وسيتواصل معك فريق المبيعات قريباً
-          لتأكيد التوصيل.
+          احتفظ برقم الطلب للمتابعة. تم إرسال التفاصيل بنجاح وسيتواصل معك فريق
+          المبيعات قريباً لتأكيد التوصيل.
         </p>
         <button
           onclick="closeSuccessModal()"
