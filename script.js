@@ -1,5 +1,18 @@
 function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: "instant" });
+  activeCategory = "all";
+  searchQuery = "";
+
+  const searchInput = document.getElementById("searchInput");
+  const searchSuggestions = document.getElementById("searchSuggestions");
+  if (searchInput) searchInput.value = "";
+  if (searchSuggestions) searchSuggestions.innerHTML = "";
+
+  closeSearch();
+  closeCategoryMenu();
+  document.getElementById("activeCategoryLabel").innerText = "كل الأقسام";
+  renderCategoryMenu();
+  renderProducts();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Delivery Cost Constant
@@ -8,9 +21,10 @@ const DELIVERY_FEE = 5;
 let products = [];
 
 // Cart State Object: { productId: quantity }
-let cart = {};
+let cart = loadCart();
 let activeCategory = "all";
 let searchQuery = "";
+let deferredInstallPrompt = null;
 const categories = [
   "أدوات الرسم",
   "أقلام و أدوات مكتبية",
@@ -21,6 +35,9 @@ const categories = [
 
 // Initialize Page
 document.addEventListener("DOMContentLoaded", async () => {
+  registerServiceWorker();
+  setupInstallPrompt();
+
   try {
     const response = await fetch("./products.json");
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -100,6 +117,67 @@ function normalizeSearchText(value) {
     .replace(/[إأآٱ]/g, "ا")
     .replace(/ى/g, "ي")
     .trim();
+}
+
+function loadCart() {
+  try {
+    const savedCart = JSON.parse(localStorage.getItem("shoppingCart") || "{}");
+    return savedCart && typeof savedCart === "object" ? savedCart : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveCart() {
+  localStorage.setItem("shoppingCart", JSON.stringify(cart));
+}
+
+function clearCart() {
+  cart = {};
+  localStorage.removeItem("shoppingCart");
+  renderProducts();
+  updateCartUI();
+}
+
+function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+      console.error("Service worker registration failed:", error);
+    });
+  }
+}
+
+function setupInstallPrompt() {
+  const installButton = document.getElementById("installAppButton");
+  if (
+    !installButton ||
+    localStorage.getItem("installPromptDismissed") === "true"
+  ) {
+    return;
+  }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButton.classList.remove("hidden");
+  });
+
+  installButton.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+
+    deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.classList.add("hidden");
+    if (choice.outcome === "dismissed") {
+      localStorage.setItem("installPromptDismissed", "true");
+    }
+  });
+
+  window.addEventListener("appinstalled", () => {
+    installButton.classList.add("hidden");
+    deferredInstallPrompt = null;
+  });
 }
 
 function toggleSearch() {
@@ -293,6 +371,8 @@ function changeQty(productId, delta) {
     cart[productId] = newQty;
   }
 
+  saveCart();
+
   // Update specific element counter
   const qtyElement = document.getElementById(`qty-${productId}`);
   if (qtyElement) qtyElement.innerText = cart[productId] || 0;
@@ -304,6 +384,7 @@ function updateCartUI() {
   let subtotal = 0;
   let totalItemsCount = 0;
   const cartItemsContainer = document.getElementById("cartSummaryList");
+  const clearCartButton = document.getElementById("clearCartButton");
 
   const selectedItems = Object.keys(cart).map((id) => {
     const product = products.find((p) => p.id === id);
@@ -316,8 +397,10 @@ function updateCartUI() {
 
   // Render Mini Cart List
   if (selectedItems.length === 0) {
+    clearCartButton.classList.add("hidden");
     cartItemsContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-xs">لم تقم بإضافة أي منتج بعد.</p>`;
   } else {
+    clearCartButton.classList.remove("hidden");
     cartItemsContainer.innerHTML = selectedItems
       .map(
         (item) => `

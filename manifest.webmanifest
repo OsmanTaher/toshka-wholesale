@@ -1,0 +1,20 @@
+{
+  "name": "متجر بيعلي جملة",
+  "short_name": "بيعلي جملة",
+  "description": "متجر الأدوات المدرسية والمكتبية",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "./image/logo.avif",
+      "sizes": "512x512",
+      "type": "image/avif",
+      "purpose": "any maskable"
+    }
+  ]
+}
