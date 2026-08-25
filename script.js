@@ -5,791 +5,12 @@ function scrollToTop() {
 // Delivery Cost Constant
 const DELIVERY_FEE = 5;
 
-const products = [
-  // 📚 كشاكيل و كراسات
-  {
-    id: "1",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول 60 ورقة (دستة)",
-    price: 59,
-    oldPrice: 72,
-    image: "./image/كشاكيل و كراسات/كشكول 60.webp",
-    description: "كشكول ورق عالي الجودة - سعر الدستة.",
-  },
-  {
-    id: "2",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول 80 ورقة (دستة)",
-    price: 78,
-    oldPrice: 95,
-    image: "./image/كشاكيل و كراسات/كشكول 80.webp",
-    description: "كشكول ورق فاخر - سعر الدستة.",
-  },
-  {
-    id: "3",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول سلك صغير 60 ورقة",
-    price: 12,
-    oldPrice: 15,
-    image: "./image/كشاكيل و كراسات/سلك صغير 60.webp",
-    description: "كشكول سلك مقاس صغير 60 ورقة.",
-  },
-  {
-    id: "4",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول سلك صغير 60 ورقة (غلاف مقوى)",
-    price: 12,
-    oldPrice: 15,
-    image: "./image/كشاكيل و كراسات/سلك صغير 60 ورقة.webp",
-    description: "كشكول سلك صغير بغلاف مقوى خامة متينة.",
-  },
-  {
-    id: "5",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول سلك صغير 80 ورقة",
-    price: 15,
-    oldPrice: 18,
-    image: "./image/كشاكيل و كراسات/سلك صغير 80.webp",
-    description: "كشكول سلك مقاس صغير 80 ورقة.",
-  },
-  {
-    id: "6",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول صغير 60 ورقة",
-    price: 6,
-    oldPrice: 7.5,
-    image: "./image/كشاكيل و كراسات/كشكول صغير 60.webp",
-    description: "كشكول حجم صغير 60 ورقة.",
-  },
-  {
-    id: "7",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول صغير 80 ورقة",
-    price: 8,
-    oldPrice: 9,
-    image: "./image/كشاكيل و كراسات/كشكول صغير 80.webp",
-    description: "كشكول حجم صغير 80 ورقة.",
-  },
-  {
-    id: "8",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول كبير 80 ورقة",
-    price: 20,
-    oldPrice: 24,
-    image: "./image/كشاكيل و كراسات/كشكول كبير 80.webp",
-    description: "كشكول مقاس كبير 80 ورقة.",
-  },
-  {
-    id: "9",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كراسة كبيرة 80 ورقة",
-    price: 24,
-    oldPrice: 28,
-    image: "./image/كشاكيل و كراسات/كراسة كبير 80.webp",
-    description: "كراسة حجم كبير 80 ورقة ورق أبيض ممتاز.",
-  },
-  {
-    id: "10",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول كوري 80 ورقة",
-    price: 15,
-    oldPrice: 20,
-    image: "./image/كشاكيل و كراسات/كشكول كوري 80.webp",
-    description: "كشكول كوري فاخر 80 ورقة.",
-  },
-  {
-    id: "11",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول سلك 80 ورقة كبير",
-    price: 27.5,
-    oldPrice: 34,
-    image: "./image/كشاكيل و كراسات/كشكول سلك 80.webp",
-    description: "كشكول سلك حجم كبير 80 ورقة.",
-  },
-  {
-    id: "12",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 6,
-    name: "كشكول سلك 100 ورقة",
-    price: 31,
-    oldPrice: 40,
-    image: "./image/كشاكيل و كراسات/كشكول سلك 100.webp",
-    description: "كشكول سلك حجم كبير 100 ورقة.",
-  },
-  {
-    id: "13",
-    category: "كشاكيل و كراسات",
-    isActive: true,
-    maxQty: 4,
-    name: "كراسة رسم بياني",
-    price: 7,
-    oldPrice: 10,
-    image: "./image/كشاكيل و كراسات/كراسة رسم بياني.webp",
-    description: "كراسة مربعات رسم بياني مخصصة للرياضيات والهندسة.",
-  },
-
-  // ✏️ أقلام و أدوات مكتبية
-  {
-    id: "14",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم جاف أحمر",
-    price: 4,
-    oldPrice: 5,
-    image: "./image/أقلام و أدوات مكتبية/قلم جاف أحمر.webp",
-    description: "قلم جاف لون أحمر كتابة سلسة.",
-  },
-  {
-    id: "15",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم جاف أزرق",
-    price: 4,
-    oldPrice: 5,
-    image: "./image/أقلام و أدوات مكتبية/قلم جاف أزرق.webp",
-    description: "قلم جاف لون أزرق كتابة واضحة.",
-  },
-  {
-    id: "16",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم جاف أسود",
-    price: 4,
-    oldPrice: 5,
-    image: "./image/أقلام و أدوات مكتبية/قلم جاف أسود.webp",
-    description: "قلم جاف لون أسود ممتاز.",
-  },
-  {
-    id: "17",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة قلم جاف أحمر (روتو)",
-    price: 38,
-    oldPrice: 46.5,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم جاف أحمر.webp",
-    description: "عبوة أقلام جاف روتو لون أحمر.",
-  },
-  {
-    id: "18",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم جاف روتو (عبوة أزرق)",
-    price: 38,
-    oldPrice: 46.5,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم جاف أزرق.webp",
-    description: "عبوة أقلام جاف روتو كتابة سلسة لون أزرق.",
-  },
-  {
-    id: "19",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة قلم جاف أسود (روتو)",
-    price: 38,
-    oldPrice: 46.5,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم جاف أسود.webp",
-    description: "عبوة أقلام جاف روتو لون أسود.",
-  },
-  {
-    id: "20",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم رصاص (عبوة 12 قطعة)",
-    price: 15,
-    oldPrice: 18.5,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم رصاص 12 قطعة.webp",
-    description: "عبوة أقلام رصاص ممتازة للرسم والكتابة.",
-  },
-  {
-    id: "21",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم سبورة أحمر",
-    price: 8,
-    oldPrice: 10,
-    image: "./image/أقلام و أدوات مكتبية/قلم سبورة أسود.webp",
-    description: "قلم سبورة مسح سريع لون أحمر.",
-  },
-  {
-    id: "22",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم سبورة أزرق",
-    price: 8,
-    oldPrice: 10,
-    image: "./image/أقلام و أدوات مكتبية/قلم سبورة أسود.webp",
-    description: "قلم سبورة مسح سريع لون أزرق.",
-  },
-  {
-    id: "23",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم سبورة أسود",
-    price: 8,
-    oldPrice: 10,
-    image: "./image/أقلام و أدوات مكتبية/قلم سبورة أسود.webp",
-    description: "قلم سبورة مسح سريع لون أسود.",
-  },
-  {
-    id: "24",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة قلم سبورة أحمر",
-    price: 94,
-    oldPrice: 115,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم سبورة أحمر.webp",
-    description: "عبوة أقلام سبورة روتو أحمر عالي الجودة.",
-  },
-  {
-    id: "25",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة قلم سبورة أزرق",
-    price: 94,
-    oldPrice: 115,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم سبورة أزرق.webp",
-    description: "عبوة أقلام سبورة روتو أزرق عالي الجودة.",
-  },
-  {
-    id: "26",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم سبورة روتو (علبة أسود)",
-    price: 94,
-    oldPrice: 115,
-    image: "./image/أقلام و أدوات مكتبية/علبة قلم سبورة أسود.webp",
-    description: "عبوة أقلام سبورة روتو عالي الجودة لون أسود.",
-  },
-  {
-    id: "27",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم كوريكتور",
-    price: 7,
-    oldPrice: 8.5,
-    image: "./image/أقلام و أدوات مكتبية/كوركتير.webp",
-    description: "قلم تصحيح جاف لتغطية فورية.",
-  },
-  {
-    id: "28",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 4,
-    name: " علبة كوركتير 12 قطعة",
-    price: 75,
-    oldPrice: 84,
-    image: "./image/أقلام و أدوات مكتبية/علبة كوركتير.webp",
-    description: "علبة أقلام تصحيح جاف بسعر الجملة.",
-  },
-  {
-    id: "29",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم مظهر (هايلتر دستة)",
-    price: 25,
-    oldPrice: 40,
-    image: "./image/أقلام و أدوات مكتبية/هايلتر.webp",
-    description: "قلم تحديد نيون فسفوري للكتب والملاحظات.",
-  },
-  {
-    id: "30",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "قلم مظهر (هايلتر واحدة)",
-    price: 8,
-    oldPrice: 10,
-    image: "./image/أقلام و أدوات مكتبية/هايلتر.webp",
-    description: "قلم تحديد نيون فسفوري للكتب والملاحظات.",
-  },
-  {
-    id: "31",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "أستيكة صغير",
-    price: 0.75,
-    oldPrice: 1.25,
-    image: "./image/أقلام و أدوات مكتبية/أستيكة صغير.webp",
-    description: "ممحاة ناعمة مسح نظيف بدون أثر.",
-  },
-  {
-    id: "32",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "أستيكة مستطيل",
-    price: 1.25,
-    oldPrice: 1.75,
-    image: "./image/أقلام و أدوات مكتبية/أستيكة مستطيل.webp",
-    description: "ممحاة كبيرة عالية الجودة.",
-  },
-  {
-    id: "33",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 3,
-    name: "علبة أستيكة صغير 60 قطعة",
-    price: 38,
-    oldPrice: 45,
-    image: "./image/أقلام و أدوات مكتبية/علبة أستيكة صغير.webp",
-    description: "علبة ممحاة حجم صغير بسعر الجملة.",
-  },
-  {
-    id: "34",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 1,
-    name: "علبة أستيكة مستطيل 72 قطعة",
-    price: 80,
-    oldPrice: 90,
-    image: "./image/أقلام و أدوات مكتبية/علبة أستيكة مستطيل.webp",
-    description: "علبة أستيكة كبيرة مستطيلة خامة ممتازة.",
-  },
-  {
-    id: "35",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 10,
-    name: "براية صغيرة",
-    price: 1.5,
-    oldPrice: 2.5,
-    image: "./image/أقلام و أدوات مكتبية/براية.webp",
-    description: "براية معدنية حادة وقوية.",
-  },
-  {
-    id: "36",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "براية دائرة",
-    price: 1.5,
-    oldPrice: 2.5,
-    image: "./image/أقلام و أدوات مكتبية/براية دائرة.webp",
-    description: "براية بلاستيك شكل دائري بمخزن.",
-  },
-  {
-    id: "37",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "براية مستطيل",
-    price: 3.5,
-    oldPrice: 4.5,
-    image: "./image/أقلام و أدوات مكتبية/براية مستطيل.webp",
-    description: "براية بمخزن شكل مستطيل.",
-  },
-  {
-    id: "38",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 1,
-    name: "علبة براية 80 قطعة",
-    price: 110,
-    oldPrice: 120,
-    image: "./image/أقلام و أدوات مكتبية/علبة براية 80 قطعة.webp",
-    description: "عبوة اقتصادية تحتوي على 80 براية.",
-  },
-  {
-    id: "39",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 1,
-    name: "علبة براية دائرة 80 قطعة",
-    price: 110,
-    oldPrice: 120,
-    image: "./image/أقلام و أدوات مكتبية/علبة براية دائرة 80 قطعة.webp",
-    description: "عبوة براية دائرة بمخزن 80 قطعة.",
-  },
-  {
-    id: "40",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة براية مستطيل 48 قطعة",
-    price: 150,
-    oldPrice: 168,
-    image: "./image/أقلام و أدوات مكتبية/علبة براية مستطيل.webp",
-    description: "علبة براية مستطيلة بمخزن بسعر الجملة.",
-  },
-  {
-    id: "41",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 12,
-    name: "تكت أسماء",
-    price: 1,
-    oldPrice: 1.5,
-    image: "./image/أقلام و أدوات مكتبية/تكت.webp",
-    description: "ملصقات أسماء للكراسات والكتب.",
-  },
-  {
-    id: "42",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "جلاد كراسات (10 وحدات)",
-    price: 11,
-    oldPrice: 13.5,
-    image: "./image/أقلام و أدوات مكتبية/جلاد.webp",
-    description: "باكت يحتوي على 10 وحدات جلاد شفاف للحماية.",
-  },
-  {
-    id: "43",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "صمغ سائل شفاف",
-    price: 5.5,
-    oldPrice: 7,
-    image: "./image/أقلام و أدوات مكتبية/صغ سائل شفاف.webp",
-    description: "صمغ سائل شفاف قوي وسريع الجفاف.",
-  },
-  {
-    id: "44",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "صمغ روج",
-    price: 5.5,
-    oldPrice: 7,
-    image: "./image/أقلام و أدوات مكتبية/صمغ روج.webp",
-    description: "صمغ أصبع جاف وسهل الاستخدام.",
-  },
-  {
-    id: "45",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "صمغ سائل",
-    price: 5.5,
-    oldPrice: 7,
-    image: "./image/أقلام و أدوات مكتبية/صمغ سائل.webp",
-    description: "أنبوب صمغ سائل مخصص للأوراق والأعمال اليدوية.",
-  },
-  {
-    id: "46",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 2,
-    name: "علبة صمغ روج 24 قطعة",
-    price: 120,
-    oldPrice: 132,
-    image: "./image/أقلام و أدوات مكتبية/علبة صمغ روج.webp",
-    description: "علبة صمغ روج كبير بسعر اقتصادية.",
-  },
-  {
-    id: "47",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة صمغ سائل 24 قطعة",
-    price: 120,
-    oldPrice: 132,
-    image: "./image/أقلام و أدوات مكتبية/علبة صمغ سائل.webp",
-    description: "علبة صمغ سائل متكاملة للجملة.",
-  },
-  {
-    id: "48",
-    category: "أقلام و أدوات مكتبية",
-    isActive: true,
-    maxQty: 6,
-    name: "طقم أدوات هندسية",
-    price: 38.5,
-    oldPrice: 45,
-    image: "./image/أقلام و أدوات مكتبية/طقم هندسي.webp",
-    description: "علبة أدوات هندسية متكاملة للطلاب.",
-  },
-
-  // 🎨 أدوات الرسم
-  {
-    id: "49",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 6,
-    name: "ألوان خشب صغير",
-    price: 9,
-    oldPrice: 12,
-    image: "./image/أدوات الرسم/ألوان خشب صغير.webp",
-    description: "علبة ألوان خشبية حجم صغير.",
-  },
-  {
-    id: "50",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 6,
-    name: "علبة ألوان خشب كبير",
-    price: 13.5,
-    oldPrice: 17,
-    image: "./image/أدوات الرسم/علبة ألوان خشب كبير.webp",
-    description: "علبة ألوان خشبية حجم كبير ألوان زاهية.",
-  },
-  {
-    id: "51",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 6,
-    name: "كراسة رسم صغيرة",
-    price: 3.5,
-    oldPrice: 5,
-    image: "./image/أدوات الرسم/رسم صغير.webp",
-    description: "كراسة رسم حجم صغير للطلاب.",
-  },
-  {
-    id: "52",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 6,
-    name: "كراسة رسم كبيرة",
-    price: 6.5,
-    oldPrice: 9,
-    image: "./image/أدوات الرسم/رسم كبير.webp",
-    description: "كراسة رسم حجم كبير ورق متين.",
-  },
-  {
-    id: "53",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 6,
-    name: "مسطرة شفاف",
-    price: 2,
-    oldPrice: 3,
-    image: "./image/أدوات الرسم/مسطرة شفاف.webp",
-    description: "مسطرة مدرجة شفافة عالية الدقة.",
-  },
-  {
-    id: "54",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 6,
-    name: "مسطرة ملون",
-    price: 1.5,
-    oldPrice: 2.5,
-    image: "./image/أدوات الرسم/مسطرة ملون.webp",
-    description: "مسطرة بلاستيك مرنة وملونة.",
-  },
-  {
-    id: "55",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 2,
-    name: "دستة مسطرة شفاف",
-    price: 40,
-    oldPrice: 48,
-    image: "./image/أدوات الرسم/دستة مسطرة شفاف.webp",
-    description: "عبوة تحتوي على 24 مسطرة شفافة.",
-  },
-  {
-    id: "56",
-    category: "أدوات الرسم",
-    isActive: true,
-    maxQty: 2,
-    name: "دستة مسطرة ملون",
-    price: 30,
-    oldPrice: 36,
-    image: "./image/أدوات الرسم/دستة مسطرة ملون.webp",
-    description: "عبوة تحتوي على 24 مسطرة ملونة متينة.",
-  },
-
-  // 🍱 لانشبوك و زمزمية
-  {
-    id: "57",
-    category: "لانشبوك و زمزمية",
-    isActive: true,
-    maxQty: 6,
-    name: "زمزمية",
-    price: 25,
-    oldPrice: 30,
-    image: "./image/لانشبوك و زمزمية/زمزمية.webp",
-    description: "زجاجة مياه صحية للمدرسة.",
-  },
-  {
-    id: "58",
-    category: "لانشبوك و زمزمية",
-    isActive: true,
-    maxQty: 4,
-    name: "لانش بوكس فقط",
-    price: 40,
-    oldPrice: 50,
-    image: "./image/لانشبوك و زمزمية/لانشبوكس.webp",
-    description: "وعاء حفظ طعام مخصص للمدرسة مقاوِم للتسريب.",
-  },
-  {
-    id: "59",
-    category: "لانشبوك و زمزمية",
-    isActive: true,
-    maxQty: 3,
-    name: "لانش بوكس طقم (أزرق)",
-    price: 57,
-    oldPrice: 70,
-    image: "./image/لانشبوك و زمزمية/لانشبوكس طقم  أزرق.webp",
-    description: "طقم متكامل لانش بوكس مع زمزمية طقم أزرق.",
-  },
-  {
-    id: "60",
-    category: "لانشبوك و زمزمية",
-    isActive: true,
-    maxQty: 3,
-    name: "لانش بوكس طقم (أخضر)",
-    price: 57,
-    oldPrice: 70,
-    image: "./image/لانشبوك و زمزمية/لانشبوكس طقم أخضر.webp",
-    description: "طقم متكامل لانش بوكس مع زمزمية طقم أخضر.",
-  },
-  {
-    id: "61",
-    category: "لانشبوك و زمزمية",
-    isActive: true,
-    maxQty: 3,
-    name: "لانش بوكس طقم (بمبي)",
-    price: 57,
-    oldPrice: 70,
-    image: "./image/لانشبوك و زمزمية/لانشبوكس طقم بنبي.webp",
-    description: "طقم متكامل لانش بوكس مع زمزمية طقم بمبي.",
-  },
-
-  // 🎒 مقالم و شنط
-  {
-    id: "62",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنطة أديداس كبيرة",
-    price: 180,
-    oldPrice: 220,
-    image: "./image/مقالم و شنط/شنطة أديدس كبير.webp",
-    description: "شنطة مدرسية كبيرة متعددة الجيوب خامة ممتازة.",
-  },
-  {
-    id: "63",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنطة بناتي وسط برتقالي",
-    price: 135,
-    oldPrice: 165,
-    image: "./image/مقالم و شنط/شنطة بناتي وسط برتقالي.webp",
-    description: "حقيبة مدرسية بناتي حجم وسط لون برتقالي.",
-  },
-  {
-    id: "64",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنطة بناتي وسط",
-    price: 135,
-    oldPrice: 165,
-    image: "./image/مقالم و شنط/شنطة بناتي وسط.webp",
-    description: "حقيبة مدرسية متينة وعملية للبنات.",
-  },
-  {
-    id: "65",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنط درس (بناتي)",
-    price: 25.5,
-    oldPrice: 31,
-    image: "./image/مقالم و شنط/شنطة درس بناتي.webp",
-    description: "حقيبة دروس خفيفة وعملية تصميم بناتي.",
-  },
-  {
-    id: "66",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنط درس (ولادي)",
-    price: 25.5,
-    oldPrice: 31,
-    image: "./image/مقالم و شنط/شنطة درس ولادي.webp",
-    description: "حقيبة دروس خفيفة وعملية تصميم ولادي.",
-  },
-  {
-    id: "67",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنطة صغيرة بناتي",
-    price: 45,
-    oldPrice: 55,
-    image: "./image/مقالم و شنط/شنطة صغير بناتي.webp",
-    description: "شنطة خفيفة للرحلات والأنشطة.",
-  },
-  {
-    id: "68",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنطة ولادي كحلي وسط",
-    price: 150,
-    oldPrice: 183,
-    image: "./image/مقالم و شنط/شنطة ولادي كحلي وسط.webp",
-    description: "شنطة مدرسية خامة ممتازة لون كحلي.",
-  },
-  {
-    id: "69",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "شنطة ولادي وسط",
-    price: 150,
-    oldPrice: 183,
-    image: "./image/مقالم و شنط/شنطة ولادي وسط.webp",
-    description: "حقيبة ظهر خامة عالية الجودة للطلاب.",
-  },
-  {
-    id: "70",
-    category: "مقالم و شنط",
-    isActive: true,
-    maxQty: 6,
-    name: "مقلمة صنف ثالث",
-    price: 8,
-    oldPrice: 12,
-    image: "./image/مقالم و شنط/مقلمة صنف ثالث.webp",
-    description: "مقلمة أنيقة بعدة جيوب.",
-  },
-];
+let products = [];
 
 // Cart State Object: { productId: quantity }
 let cart = {};
 let activeCategory = "all";
+let searchQuery = "";
 const categories = [
   "أدوات الرسم",
   "أقلام و أدوات مكتبية",
@@ -799,10 +20,26 @@ const categories = [
 ];
 
 // Initialize Page
-document.addEventListener("DOMContentLoaded", () => {
-  renderCategoryMenu();
-  renderProducts();
-  updateCartUI();
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const response = await fetch("./products.json");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const loadedProducts = await response.json();
+    if (!Array.isArray(loadedProducts)) {
+      throw new Error("products.json must contain an array");
+    }
+
+    products = loadedProducts;
+    renderCategoryMenu();
+    renderProducts();
+    updateCartUI();
+  } catch (error) {
+    console.error("Failed to load products:", error);
+    document.getElementById("productsGrid").innerHTML =
+      '<p class="sm:col-span-2 text-center text-rose-600 py-10">تعذر تحميل المنتجات حاليًا.</p>';
+  }
+
   updateScrollProgress();
   window.addEventListener("scroll", updateScrollProgress, {
     passive: true,
@@ -855,6 +92,87 @@ function closeCategoryMenu() {
   toggle.querySelector("i").className = "fa-solid fa-bars";
 }
 
+function normalizeSearchText(value) {
+  return value
+    .toLocaleLowerCase("ar")
+    .normalize("NFKD")
+    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[إأآٱ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .trim();
+}
+
+function toggleSearch() {
+  const panel = document.getElementById("searchPanel");
+  const toggle = document.getElementById("searchToggle");
+  const isOpening = panel.classList.contains("hidden");
+
+  panel.classList.toggle("hidden", !isOpening);
+  toggle.setAttribute("aria-expanded", String(isOpening));
+  toggle.querySelector("i").className = isOpening
+    ? "fa-solid fa-xmark"
+    : "fa-solid fa-magnifying-glass";
+
+  if (isOpening) document.getElementById("searchInput").focus();
+}
+
+function closeSearch() {
+  const panel = document.getElementById("searchPanel");
+  const toggle = document.getElementById("searchToggle");
+
+  if (panel.classList.contains("hidden")) return;
+
+  panel.classList.add("hidden");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.querySelector("i").className = "fa-solid fa-magnifying-glass";
+}
+
+function handleSearchInput() {
+  searchQuery = document.getElementById("searchInput").value.trim();
+  renderSearchSuggestions();
+  renderProducts();
+}
+
+function renderSearchSuggestions() {
+  const container = document.getElementById("searchSuggestions");
+  const normalizedQuery = normalizeSearchText(searchQuery);
+
+  if (!normalizedQuery) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const suggestions = products
+    .filter(
+      (product) =>
+        product.isActive &&
+        normalizeSearchText(product.name).includes(normalizedQuery),
+    )
+    .slice(0, 6);
+
+  container.innerHTML = suggestions.length
+    ? suggestions
+        .map(
+          (product) => `
+            <button type="button" onclick="selectSearchSuggestion('${product.id}')" class="w-full text-right px-3 py-2 rounded-lg text-sm hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
+              ${product.name}
+            </button>
+          `,
+        )
+        .join("")
+    : '<p class="px-3 py-2 text-xs text-slate-400">لا توجد منتجات مطابقة.</p>';
+}
+
+function selectSearchSuggestion(productId) {
+  const product = products.find((item) => item.id === productId);
+  if (!product) return;
+
+  searchQuery = product.name;
+  document.getElementById("searchInput").value = product.name;
+  closeSearch();
+  renderProducts();
+}
+
 function scrollBelowHeader(element) {
   const header = document.querySelector("header");
   const headerHeight = header ? header.offsetHeight : 0;
@@ -865,6 +183,11 @@ function scrollBelowHeader(element) {
 }
 
 function selectCategory(category) {
+  searchQuery = "";
+  document.getElementById("searchInput").value = "";
+  document.getElementById("searchSuggestions").innerHTML = "";
+  closeSearch();
+
   if (category === "order-summary") {
     closeCategoryMenu();
     scrollBelowHeader(document.getElementById("cartSummaryList"));
@@ -881,19 +204,24 @@ function selectCategory(category) {
 }
 
 document.addEventListener("click", (event) => {
-  const menuWrapper = document.getElementById("menuToggle").parentElement;
+  const menuWrapper = document.getElementById("menuWrapper");
+  const searchWrapper = document.getElementById("searchWrapper");
 
   if (!menuWrapper.contains(event.target)) closeCategoryMenu();
+  if (!searchWrapper.contains(event.target)) closeSearch();
 });
 
 function renderProducts() {
   const container = document.getElementById("productsGrid");
   container.innerHTML = products
-    .filter(
-      (product) =>
-        product.isActive &&
-        (activeCategory === "all" || product.category === activeCategory),
-    )
+    .filter((product) => {
+      const matchesCategory =
+        activeCategory === "all" || product.category === activeCategory;
+      const matchesSearch = normalizeSearchText(product.name).includes(
+        normalizeSearchText(searchQuery),
+      );
+      return product.isActive && matchesCategory && matchesSearch;
+    })
     .map((product) => {
       const qty = cart[product.id] || 0;
       return `
