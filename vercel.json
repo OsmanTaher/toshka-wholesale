@@ -1,25 +1,18 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/image/logo.avif",
-      "destination": "/image/logo.avif"
+      "src": "/image/(.*)",
+      "dest": "/image/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/maintenance.html"
+      "src": "/maintenance.html",
+      "dest": "/maintenance.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/maintenance.html"
     }
   ]
 }
