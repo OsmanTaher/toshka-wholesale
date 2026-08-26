@@ -3,7 +3,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/((?!image/logo\\.avif).*)",
+      "source": "/((?!image/).*)",
       "headers": [
         {
           "key": "Cache-Control",
