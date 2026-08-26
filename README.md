@@ -89,6 +89,7 @@ npm install --global vercel
 ```env
 TELEGRAM_BOT_TOKEN=ضع_توكن_البوت_هنا
 TELEGRAM_CHAT_ID=ضع_معرف_المحادثة_هنا
+GOOGLE_SHEET_URL=https://script.google.com/macros/s/معرف_النشر/exec
 ```
 
 ثم شغّل بيئة التطوير:
@@ -126,13 +127,16 @@ vercel dev
 4. من **Project Settings > Environment Variables** أضف:
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`
+
+- `GOOGLE_SHEET_URL`، وهو رابط Web App المنتهي بـ `/exec`.
+
 5. اختر البيئات المطلوبة: Production وPreview وDevelopment حسب الحاجة.
 6. نفّذ Deploy.
 7. اختبر الموقع بإضافة منتج وإرسال طلب تجريبي، ثم تحقق من وصول الرسالة إلى Telegram.
 
 ### ملاحظة عن `.env.example`
 
-يوجد ملف [.env.example](.env.example) كمرجع، لكن أسماء المتغيرات التي تقرأها الدالة هي `TELEGRAM_BOT_TOKEN` و`TELEGRAM_CHAT_ID` مباشرة. عند التشغيل المحلي استخدم ملف `.env` بهذه الأسماء دون بادئة `ENV.`، وتأكد من عدم نشر الملف أو قيمه السرية.
+يوجد ملف [.env.example](.env.example) كمرجع. أسماء المتغيرات التي تقرأها الدالة هي `TELEGRAM_BOT_TOKEN` و`TELEGRAM_CHAT_ID` و`GOOGLE_SHEET_URL` مباشرة. عند التشغيل المحلي استخدم ملف `.env` بهذه الأسماء دون بادئة `ENV.`، وتأكد من عدم نشر الملف أو قيمه السرية.
 
 ## إدارة المنتجات
 
@@ -228,7 +232,7 @@ shopping/
 
 ### لا يصل الطلب إلى Telegram
 
-- تأكد من وجود `TELEGRAM_BOT_TOKEN` و`TELEGRAM_CHAT_ID` في بيئة Vercel.
+- تأكد من وجود `TELEGRAM_BOT_TOKEN` و`TELEGRAM_CHAT_ID` و`GOOGLE_SHEET_URL` في بيئة Vercel.
 - أعد النشر بعد تعديل متغيرات البيئة.
 - تأكد من أن البوت يستطيع إرسال الرسائل إلى المحادثة أو المجموعة.
 - راجع سجل الدالة في Vercel، ثم اختبر المسار من خلال إرسال طلب تجريبي من الموقع.
@@ -237,7 +241,7 @@ shopping/
 
 - شغّل المشروع باستخدام `vercel dev` بدل خادم ملفات ثابت فقط.
 - تأكد من أن الطلب يرسل إلى `/api/send-telegram` من نفس المضيف.
-- لا تستخدم أسماء المتغيرات `ENV.TELEGRAM_BOT_TOKEN` و`ENV.TELEGRAM_CHAT_ID`؛ استخدم الأسماء التي تقرؤها الدالة مباشرة.
+- لا تستخدم أسماء المتغيرات `ENV.TELEGRAM_BOT_TOKEN` أو `ENV.TELEGRAM_CHAT_ID`؛ استخدم الأسماء التي تقرؤها الدالة مباشرة.
 
 ## الترخيص والملكية
 

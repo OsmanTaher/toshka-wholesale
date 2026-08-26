@@ -1,49 +1,102 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const orderData = req.body;
-  const GOOGLE_SHEET_URL = process.env.GOOGLE_SHEET_URL;
-  const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-  const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+  try {
+    const orderData = req.body;
+    const GOOGLE_SHEET_URL = process.env.GOOGLE_SHEET_URL;
+    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-  // ملخص الطلبات لعمود order في الشيت
-  const orderSummary = orderData.cart.map((item, idx) => `${idx + 1}. ${item.name} (عدد: ${item.quantity})`).join(' | ');
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      return res
+        .status(500)
+        .json({ success: false, error: "Telegram settings are missing" });
+    }
 
-  // حساب إجمالي الفاتورة (المنتجات + التوصيل)
-  const itemsSubtotal = orderData.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const deliveryFee = Number(orderData.deliveryFee || 5);
-  const grandTotal = itemsSubtotal + deliveryFee;
+    if (
+      !orderData?.message ||
+      !Array.isArray(orderData.cart) ||
+      orderData.cart.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid order data" });
+    }
 
-  // 1. طلب التليجرام
-  const telegramPromise = fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT_ID,
-      text: formatTelegramMessage(orderData, grandTotal, itemsSubtotal, deliveryFee),
-      parse_mode: 'HTML'
-    })
-  });
+    const orderSummary = orderData.cart
+      .map((item, idx) => `${idx + 1}. ${item.name} (عدد: ${item.quantity})`)
+      .join(" | ");
+    const itemsSubtotal = orderData.cart.reduce(
+      (sum, item) => sum + Number(item.price) * Number(item.quantity),
+      0,
+    );
+    const deliveryFee = Number(orderData.deliveryFee || 5);
+    const grandTotal = itemsSubtotal + deliveryFee;
 
-  // 2. طلب Google Sheet
-  const sheetPromise = GOOGLE_SHEET_URL ? fetch(GOOGLE_SHEET_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      order_number: orderData.orderNumber,
-      name: orderData.name,
-      phone: orderData.phone,
-      address: orderData.address,
-      notes: orderData.notes || "",
-      order_summary: orderSummary,
-      total: grandTotal,
-      items: orderData.cart
-    })
-  }) : Promise.resolve();
+    const telegramResponse = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: orderData.message,
+          parse_mode: "MarkdownV2",
+        }),
+      },
+    );
 
-  await Promise.allSettled([telegramPromise, sheetPromise]);
+    if (!telegramResponse.ok) {
+      const telegramError = await telegramResponse.text();
+      throw new Error(`Telegram ${telegramResponse.status}: ${telegramError}`);
+    }
 
-  return res.status(200).json({ success: true, message: 'Order sent successfully' });
+    if (GOOGLE_SHEET_URL) {
+      const sheetResponse = await fetch(GOOGLE_SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_number: orderData.orderNumber,
+          name: orderData.name,
+          phone: orderData.phone,
+          address: orderData.address,
+          notes: orderData.notes || "",
+          order_summary: orderSummary,
+          total: grandTotal,
+          items: orderData.cart,
+        }),
+      });
+
+      const sheetBody = await sheetResponse.text();
+      if (!sheetResponse.ok) {
+        throw new Error(`Google Sheets ${sheetResponse.status}: ${sheetBody}`);
+      }
+
+      try {
+        const sheetResult = JSON.parse(sheetBody);
+        if (sheetResult.status === "error") {
+          throw new Error(
+            sheetResult.message || "Google Sheets rejected the order",
+          );
+        }
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          throw new Error("Google Sheets returned an invalid response");
+        }
+        throw error;
+      }
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Order sent successfully" });
+  } catch (error) {
+    console.error("Order delivery failed:", error);
+    return res.status(502).json({
+      success: false,
+      error: "تعذر إرسال الطلب إلى Telegram أو Google Sheets",
+    });
+  }
 }

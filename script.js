@@ -518,8 +518,26 @@ ${itemsText}
 
 📅 *تاريخ الطلب:* ${escapeMarkdownV2(currentDate)}`;
 
-  // Send to Telegram API
-  const isSuccess = await sendTelegramMessage(message);
+  const orderItems = selectedItemsKeys.map((id) => {
+    const product = products.find((item) => item.id === id);
+    return {
+      name: product.name,
+      price: product.price,
+      quantity: cart[id],
+    };
+  });
+
+  // Send the complete order to the server so it can notify Telegram and Sheets.
+  const isSuccess = await sendTelegramMessage({
+    message,
+    orderNumber,
+    name,
+    phone,
+    address,
+    notes,
+    deliveryFee: DELIVERY_FEE,
+    cart: orderItems,
+  });
 
   submitBtn.disabled = false;
   submitBtn.innerHTML = `<i class="fa-regular fa-paper-plane"></i> <span>تأكيد وإرسال الطلب</span>`;
@@ -547,12 +565,12 @@ function escapeMarkdownV2(value) {
 
 // Send API Request to Telegram Bot using ENV variables
 // إرسال الطلب إلى سيرفر Vercel الآمن بدلاً من التلجرام مباشرة
-async function sendTelegramMessage(textMessage) {
+async function sendTelegramMessage(orderData) {
   try {
     const response = await fetch("/api/send-telegram", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: textMessage }),
+      body: JSON.stringify(orderData),
     });
 
     const result = await response.json();
