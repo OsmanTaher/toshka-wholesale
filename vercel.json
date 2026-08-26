@@ -3,15 +3,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/image/logo.avif",
-      "destination": "/image/logo.avif"
-    },
-    {
-      "source": "/manifest.webmanifest",
-      "destination": "/manifest.webmanifest"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!image/logo\\.avif).*)",
       "headers": [
         {
           "key": "Cache-Control",
