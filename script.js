@@ -75,6 +75,10 @@ function renderCategoryMenu() {
     { value: "order-summary", label: "ملخص الطلب" },
   ];
 
+  if (!isAppInstalled()) {
+    allCategories.push({ value: "install-app", label: "تثبيته كتطبيق" });
+  }
+
   menuItems.innerHTML = allCategories
     .map(
       (category) => `
@@ -147,37 +151,38 @@ function registerServiceWorker() {
   }
 }
 
-function setupInstallPrompt() {
-  const installButton = document.getElementById("installAppButton");
-  if (
-    !installButton ||
-    localStorage.getItem("installPromptDismissed") === "true"
-  ) {
-    return;
-  }
+function isAppInstalled() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
 
+function setupInstallPrompt() {
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    installButton.classList.remove("hidden");
-  });
-
-  installButton.addEventListener("click", async () => {
-    if (!deferredInstallPrompt) return;
-
-    deferredInstallPrompt.prompt();
-    const choice = await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    installButton.classList.add("hidden");
-    if (choice.outcome === "dismissed") {
-      localStorage.setItem("installPromptDismissed", "true");
-    }
+    renderCategoryMenu();
   });
 
   window.addEventListener("appinstalled", () => {
-    installButton.classList.add("hidden");
     deferredInstallPrompt = null;
+    renderCategoryMenu();
   });
+}
+
+async function installApp() {
+  closeCategoryMenu();
+
+  if (!deferredInstallPrompt) {
+    showToast("التثبيت غير متاح حاليًا من هذا المتصفح", "error");
+    return;
+  }
+
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  renderCategoryMenu();
 }
 
 function toggleSearch() {
@@ -266,6 +271,11 @@ function selectCategory(category) {
   document.getElementById("searchSuggestions").innerHTML = "";
   closeSearch();
 
+  if (category === "install-app") {
+    installApp();
+    return;
+  }
+
   if (category === "order-summary") {
     closeCategoryMenu();
     scrollBelowHeader(document.getElementById("cartSummaryList"));
@@ -302,6 +312,11 @@ function renderProducts() {
     })
     .map((product) => {
       const qty = cart[product.id] || 0;
+      const oldPrice = Number(product.oldPrice);
+      const oldPriceMarkup =
+        oldPrice > 0
+          ? `<span class="text-slate-300 line-through font-normal">${oldPrice} ج</span>`
+          : "";
       return `
                     <div class="product-card bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm flex flex-col justify-between">
                         <div>
@@ -309,7 +324,7 @@ function renderProducts() {
                                 <img src="${product.image}" alt="${product.name} loading="lazy" onclick="openImageModal(this.src, this.alt)" onkeydown="if (event.key === 'Enter' || event.key === ' ') openImageModal(this.src, this.alt)" tabindex="0" role="button" onerror="this.onerror=null; this.src='https://placehold.co/400x300/e2e8f0/475569?text=صورة+المنتج'" class="product-image w-full h-full object-cover">
                                 <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-2">
                                   <span>${product.price.toFixed(2)} ج</span>
-                                  <span class="text-slate-300 line-through font-normal">${product.oldPrice} ج</span>
+                                  ${oldPriceMarkup}
                                 </span>
                             </div>
                             <div class="p-4 space-y-1">
