@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="shortcut icon" href="./image/logo.avif" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>بيعلي جملة | نعود قريباً</title>
+    <style>
+      :root {
+        --indigo: #4f46e5;
+        --indigo-dark: #3730a3;
+        --slate-900: #1e293b;
+        --slate-600: #475569;
+        --slate-100: #f1f5f9;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        color: var(--slate-900);
+        background-color: var(--slate-100);
+        background-image:
+          linear-gradient(rgba(79, 70, 229, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(79, 70, 229, 0.045) 1px, transparent 1px);
+        background-size: 32px 32px;
+        font-family: "Tajawal", sans-serif;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .card {
+        width: min(100%, 510px);
+        padding: 38px 32px 34px;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 24px 70px rgba(30, 41, 59, 0.14);
+        animation: appear 600ms ease both;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 30px;
+        color: var(--indigo-dark);
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .brand img {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        object-fit: cover;
+        box-shadow: 0 8px 18px rgba(79, 70, 229, 0.2);
+      }
+
+      .status-icon {
+        width: 82px;
+        height: 82px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 23px;
+        border-radius: 50%;
+        color: var(--indigo);
+        background: #eef2ff;
+        font-size: 38px;
+      }
+
+      h1 {
+        margin-bottom: 13px;
+        color: var(--slate-900);
+        font-size: clamp(26px, 6vw, 34px);
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      .lead {
+        max-width: 390px;
+        margin: 0 auto 22px;
+        color: var(--slate-600);
+        font-size: 16px;
+        line-height: 1.9;
+      }
+
+      .note {
+        display: inline-block;
+        padding: 9px 15px;
+        border-radius: 9px;
+        color: var(--indigo-dark);
+        background: #eef2ff;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .footer {
+        margin-top: 29px;
+        color: #94a3b8;
+        font-size: 13px;
+      }
+
+      @keyframes appear {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 420px) {
+        body {
+          padding: 16px;
+        }
+        .card {
+          padding: 30px 21px 27px;
+          border-radius: 20px;
+        }
+        .brand {
+          margin-bottom: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="brand">
+        <img src="./image/logo.avif" alt="شعار بيعلي جملة" />
+        <span>متجر بيعلي جملة</span>
+      </div>
+      <div class="status-icon" aria-hidden="true">&#9881;</div>
+      <h1>نجهّز لكم تجربة أفضل</h1>
+      <p class="lead">
+        المنصة في تحديث مؤقت لتعود إليكم بتشكيلة الأدوات المدرسية والمكتبية،
+        بأرخص الأسعار لأهالي توشكى الكرام.
+      </p>
+      <span class="note">سنعود قريباً بإذن الله</span>
+      <p class="footer">نشكركم على زيارتكم</p>
+    </div>
+  </body>
+</html>
