@@ -1,37 +1,49 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { message } = req.body;
-  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-  const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+  const orderData = req.body;
+  const GOOGLE_SHEET_URL = process.env.GOOGLE_SHEET_URL;
+  const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-  if (!BOT_TOKEN || !CHAT_ID) {
-    return res.status(500).json({ error: "Server env variables are missing" });
-  }
+  // ملخص الطلبات لعمود order في الشيت
+  const orderSummary = orderData.cart.map((item, idx) => `${idx + 1}. ${item.name} (عدد: ${item.quantity})`).join(' | ');
 
-  try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: message,
-          parse_mode: "MarkdownV2",
-        }),
-      },
-    );
+  // حساب إجمالي الفاتورة (المنتجات + التوصيل)
+  const itemsSubtotal = orderData.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const deliveryFee = Number(orderData.deliveryFee || 5);
+  const grandTotal = itemsSubtotal + deliveryFee;
 
-    const data = await response.json();
-    if (data.ok) {
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(400).json({ error: data.description });
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+  // 1. طلب التليجرام
+  const telegramPromise = fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: formatTelegramMessage(orderData, grandTotal, itemsSubtotal, deliveryFee),
+      parse_mode: 'HTML'
+    })
+  });
+
+  // 2. طلب Google Sheet
+  const sheetPromise = GOOGLE_SHEET_URL ? fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      order_number: orderData.orderNumber,
+      name: orderData.name,
+      phone: orderData.phone,
+      address: orderData.address,
+      notes: orderData.notes || "",
+      order_summary: orderSummary,
+      total: grandTotal,
+      items: orderData.cart
+    })
+  }) : Promise.resolve();
+
+  await Promise.allSettled([telegramPromise, sheetPromise]);
+
+  return res.status(200).json({ success: true, message: 'Order sent successfully' });
 }
