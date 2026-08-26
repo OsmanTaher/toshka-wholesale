@@ -71,6 +71,18 @@
         box-shadow: 0 8px 18px rgba(79, 70, 229, 0.2);
       }
 
+      .brand-icon {
+        display: grid;
+        width: 46px;
+        height: 46px;
+        place-items: center;
+        border-radius: 13px;
+        color: var(--indigo);
+        background: #eef2ff;
+        box-shadow: 0 8px 18px rgba(79, 70, 229, 0.2);
+        font-size: 28px;
+      }
+
       .status-icon {
         width: 82px;
         height: 82px;
@@ -143,7 +155,7 @@
   <body>
     <div class="card">
       <div class="brand">
-        <img src="./image/logo.avif" alt="شعار بيعلي جملة" />
+        <div class="brand-icon" aria-hidden="true">&#128722;</div>
         <span>متجر بيعلي جملة</span>
       </div>
       <div class="status-icon" aria-hidden="true">&#9881;</div>
