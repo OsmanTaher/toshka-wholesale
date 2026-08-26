@@ -1,15 +1,24 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
+  "headers": [
     {
-      "source": "/((?!image/).*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "no-cache, no-store, must-revalidate"
         }
-      ],
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/image/logo.avif",
+      "destination": "/image/logo.avif"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/maintenance.html"
     }
   ]
