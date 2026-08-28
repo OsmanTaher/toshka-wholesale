@@ -1,0 +1,201 @@
+import json
+import re
+from collections import defaultdict
+import pandas as pd
+from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+
+print("Loading result.json...")
+
+with open('result.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+orders_list = []
+product_totals = defaultdict(int)
+
+# Regex patterns
+item_line_pattern = re.compile(r'\d+\.\s*([^\n]+)\n\s*└\s*الكمية:\s*(\d+)')
+
+messages = data.get('messages', [])
+order_id_counter = 1
+
+for msg in messages:
+    raw_text = msg.get('text', '')
+
+    if isinstance(raw_text, list):
+        text = "".join([item['text'] if isinstance(item, dict) else str(item) for item in raw_text])
+    else:
+        text = str(raw_text)
+
+    # Filter messages that represent orders
+    if "رقم الطلب:" in text:
+        order_num = re.search(r'رقم الطلب:\s*(\d+)', text)
+        name = re.search(r'الاسم:\s*([^\n]+)', text)
+        phone = re.search(r'الهاتف:\s*(\d+)', text)
+        address = re.search(r'العنوان:\s*([^\n]+)', text)
+        total = re.search(r'الإجمالي المطلوب سداده:\s*([\d\.]+)', text)
+        notes = re.search(r'ملاحظات:\s*([^\n]+)', text)
+        raw_date = re.search(r'تاريخ الطلب:\s*([^\n]+)', text)
+
+        # 1. Parse and format order date (Remove seconds)
+        formatted_date = ""
+        if raw_date:
+            date_str = raw_date.group(1).strip()
+            # Strip seconds (:SS or :٥٨) before AM/PM
+            formatted_date = re.sub(r':\d{2}(?=\s*[صمAMPM])|:[\u0660-\u066f]{2}(?=\s*[صم])', '', date_str)
+        else:
+            formatted_date = msg.get('date', '')
+
+        # 2. Check Telegram reactions for Thumbs Up (👍)
+        reactions = msg.get('reactions', [])
+        is_completed = False
+        if isinstance(reactions, list):
+            for r in reactions:
+                emoji = r.get('emoji', '') if isinstance(r, dict) else str(r)
+                if '👍' in emoji:
+                    is_completed = True
+                    break
+
+        # 3. Parse items and aggregate quantities
+        order_items_summary = []
+        if "تفاصيل الأدوات المطلوبة:" in text:
+            items_section = text.split("تفاصيل الأدوات المطلوبة:")[1]
+            if "الفاتورة المالية:" in items_section:
+                items_section = items_section.split("الفاتورة المالية:")[0]
+
+            matches = item_line_pattern.findall(items_section)
+            for product_name, qty in matches:
+                clean_name = product_name.strip()
+                product_totals[clean_name] += int(qty)
+                order_items_summary.append(f"{clean_name} (عدد: {qty})")
+
+        orders_list.append({
+            'id': order_id_counter,
+            'order_number': order_num.group(1) if order_num else '',
+            'name': name.group(1).strip() if name else '',
+            'phone': phone.group(1) if phone else '',
+            'address': address.group(1).strip() if address else '',
+            'notes': notes.group(1).strip() if notes else '',
+            'order': " | ".join(order_items_summary),
+            'total': float(total.group(1)) if total else 0.0,
+            'order_date': formatted_date,
+            'تم الطلب': is_completed
+        })
+
+        order_id_counter += 1
+
+# DataFrames creation
+df_orders = pd.DataFrame(orders_list)
+df_products = pd.DataFrame([
+    {'product_name': name, 'Quantity': qty} 
+    for name, qty in product_totals.items()
+])
+
+if not df_products.empty:
+    df_products = df_products.sort_values(by='Quantity', ascending=False)
+
+output_filename = 'styled_store_analysis.xlsx'
+
+with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
+    # Write Table 1 (Cols A to J)
+    df_orders.to_excel(writer, sheet_name='Sheet1', index=False, startcol=0)
+    
+    # Write Table 2 (Cols L to M)
+    df_products.to_excel(writer, sheet_name='Sheet1', index=False, startcol=11)
+    
+    worksheet = writer.sheets['Sheet1']
+    worksheet.views.sheetView[0].showGridLines = True
+
+    # Style Configurations
+    header_fill_t1 = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")  # Dark Blue
+    header_fill_t2 = PatternFill(start_color="D9822B", end_color="D9822B", fill_type="solid")  # Orange/Gold
+    
+    font_header_t1 = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+    font_header_t2 = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+    font_data = Font(name="Calibri", size=10)
+
+    align_center = Alignment(horizontal="center", vertical="center")
+    align_wrap = Alignment(horizontal="right", vertical="center", wrap_text=True)
+
+    thin_border = Border(
+        left=Side(style='thin', color='D9D9D9'),
+        right=Side(style='thin', color='D9D9D9'),
+        top=Side(style='thin', color='D9D9D9'),
+        bottom=Side(style='thin', color='D9D9D9')
+    )
+
+    # Style Table 1 Headers
+    for col_num in range(1, 11):
+        cell = worksheet.cell(row=1, column=col_num)
+        cell.fill = header_fill_t1
+        cell.font = font_header_t1
+        cell.alignment = align_center
+
+    # Style Table 2 Headers
+    for col_num in range(12, 14):
+        cell = worksheet.cell(row=1, column=col_num)
+        cell.fill = header_fill_t2
+        cell.font = font_header_t2
+        cell.alignment = align_center
+
+    # Style Table 1 Data Rows
+    for row in range(2, len(df_orders) + 2):
+        for col in range(1, 11):
+            cell = worksheet.cell(row=row, column=col)
+            cell.font = font_data
+            cell.border = thin_border
+            col_header = df_orders.columns[col - 1]
+            if col_header in ['order', 'notes']:
+                cell.alignment = align_wrap
+            else:
+                cell.alignment = align_center
+
+    # Style Table 2 Data Rows
+    for row in range(2, len(df_products) + 2):
+        for col in range(12, 14):
+            cell = worksheet.cell(row=row, column=col)
+            cell.font = font_data
+            cell.border = thin_border
+            cell.alignment = align_center if col == 13 else align_wrap
+
+    # Set Specific Column Widths
+    col_widths = {
+        'A': 8,   # id
+        'B': 14,  # order_number
+        'C': 18,  # name
+        'D': 15,  # phone
+        'E': 20,  # address
+        'F': 25,  # notes
+        'G': 45,  # order
+        'H': 12,  # total
+        'I': 22,  # order_date
+        'J': 12,  # تم الطلب
+        'K': 4,   # Separator Gap
+        'L': 32,  # product_name
+        'M': 12   # Quantity
+    }
+
+    for col_letter, width in col_widths.items():
+        worksheet.column_dimensions[col_letter].width = width
+
+print(f"Success! Saved styled Excel file to {output_filename}")
+
+web_data = {
+    'orders': orders_list,
+    'products': [{'product_name': name, 'Quantity': qty} for name, qty in product_totals.items()]
+}
+
+import json
+with open('data.js', 'w', encoding='utf-8') as f:
+    f.write(f"const STORE_DATA = {json.dumps(web_data, ensure_ascii=False, indent=2)};")
+
+print("Created data.js for web dashboard.")
+
+# ====================================================
+# 1. Open Telegram Desktop and navigate to the settings of the "معرض توشكى" group.
+# 2. Export the group chat history as a JSON file named `result.json`.
+# 3. Place `result.json` in the same directory as the Python script and run `main.py`.
+# 4. The script will process the chat history and generate two output files:
+#    - `data.js`        : Contains structured JSON objects (`orders` & `products`) for the web dashboard.
+#    - `summary.xlsx`   : Contains two Excel sheets (Detailed Orders & Total Products Summary).
+# 5. Open `index.html` in your browser to view the updated dashboard.
+# ====================================================

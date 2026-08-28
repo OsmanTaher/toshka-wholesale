@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المبيعات - معرض توشكى</title>
+    <!-- أيقونة الموقع Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D8A206'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z'/></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="data.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style> 
+        body { font-family: 'Cairo', sans-serif; background-color: #0E162B; } 
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen p-4 md:p-6 flex flex-col justify-between">
+
+    <div class="w-full space-y-6">
+        
+        <!-- Header & Stats -->
+        <div class="flex flex-col md:flex-row justify-between items-center bg-[#131E3A] p-6 rounded-xl shadow-lg border border-[#1F5F68] gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-[#1F5F68]/30 rounded-xl border border-[#1F5F68]">
+                    <svg class="w-8 h-8 text-[#D8A206]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-[#D8A206]">لوحة تحليل المبيعات</h1>
+                    <p class="text-sm text-slate-400">معرض توشكى - إدارة الطلبات والمنتجات</p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="flex flex-wrap gap-4 w-full md:w-auto">
+                <div class="bg-[#1F5F68]/20 border border-[#1F5F68] p-3 rounded-lg text-center flex-1 min-w-[120px]">
+                    <span class="text-xs text-slate-300 font-bold block">إجمالي الطلبات</span>
+                    <span id="stat-orders" class="text-2xl font-black text-white">0</span>
+                </div>
+                <div class="bg-[#1F5F68]/20 border border-[#D8A206]/40 p-3 rounded-lg text-center flex-1 min-w-[140px]">
+                    <span class="text-xs text-[#D8A206] font-bold block">إجمالي المبيعات</span>
+                    <span id="stat-sales" class="text-2xl font-black text-[#D8A206]">0 ج.م</span>
+                </div>
+                <!-- بطاقة إجمالي الأسعار الجديدة -->
+                <div class="bg-[#1F5F68]/30 border border-[#1F5F68] p-3 rounded-lg text-center flex-1 min-w-[140px]">
+                    <span class="text-xs text-emerald-400 font-bold block">إجمالي الأسعار</span>
+                    <span id="stat-total-price" class="text-2xl font-black text-emerald-400">0 ج.م</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+            <input type="text" id="search-input" oninput="filterData()" placeholder="🔍 بحث باسم العميل، الهاتف، أو رقم الطلب..." 
+                   class="w-full sm:w-96 px-4 py-2.5 bg-[#131E3A] border border-[#1F5F68] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D8A206] placeholder-slate-400 shadow-sm">
+            
+            <div class="flex bg-[#131E3A] p-1 rounded-lg border border-[#1F5F68]">
+                <button onclick="switchTab('orders')" id="tab-orders-btn" class="px-5 py-2 rounded-md font-bold text-sm bg-[#D8A206] text-[#0E162B] transition-all shadow-md">جدول الطلبات</button>
+                <button onclick="switchTab('products')" id="tab-products-btn" class="px-5 py-2 rounded-md font-bold text-sm text-slate-300 hover:text-white transition-all">إجمالي المنتجات</button>
+            </div>
+        </div>
+
+        <!-- Orders Table View -->
+        <div id="view-orders" class="bg-[#131E3A] rounded-xl shadow-xl border border-[#1F5F68] overflow-hidden w-full">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-right border-collapse">
+                    <thead class="bg-[#1F5F68] text-[#D8A206] text-xs uppercase tracking-wider font-bold">
+                        <tr>
+                            <th class="p-4">#</th>
+                            <th class="p-4">رقم الطلب</th>
+                            <th class="p-4">العميل</th>
+                            <th class="p-4">الهاتف</th>
+                            <th class="p-4">العنوان</th>
+                            <th class="p-4">المنتجات المطلوبة</th>
+                            <th class="p-4">ملاحظات</th> <!-- العمود الجديد -->
+                            <th class="p-4">الإجمالي</th>
+                            <th class="p-4">التاريخ</th>
+                            <th class="p-4 text-center">الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody" class="divide-y divide-[#1F5F68]/30 text-sm text-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Products Summary View -->
+        <div id="view-products" class="bg-[#131E3A] rounded-xl shadow-xl border border-[#1F5F68] overflow-hidden w-full hidden">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-right border-collapse">
+                    <thead class="bg-[#1F5F68] text-[#D8A206] text-xs uppercase tracking-wider font-bold">
+                        <tr>
+                            <th class="p-4">#</th>
+                            <th class="p-4">اسم المنتج</th>
+                            <th class="p-4 text-center">سعر الوحدة</th>
+                            <th class="p-4 text-center">إجمالي الكميات المطلوبة</th>
+                            <th class="p-4 text-center">إجمالي السعر</th> <!-- العمود الجديد -->
+                        </tr>
+                    </thead>
+                    <tbody id="products-tbody" class="divide-y divide-[#1F5F68]/30 text-sm text-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // قاموس أسعار المنتجات المأخوذة من قائمة الأسعار المرفقة
+        const PRODUCT_PRICES = {
+            "كشكول 60 ورقة": 59,
+            "كشكول 80 ورقة": 78,
+            "كشكول سلك صغير 60 ورقة": 12,
+            "كشكول سلك صغير 80 ورقة": 15,
+            "كشكول سلك صغير 100 ورقة": 17,
+            "كراس إيطالي 80 ورقة": 20,
+            "كراس إيطالي 100 ورقة": 24,
+            "كراس كوري 80 ورقة": 15,
+            "كشكول سلك كبير 60 ورقة": 20,
+            "كشكول سلك كبير 80 ورقة": 27.50,
+            "كشكول سلك كبير 100 ورقة": 31,
+            "كراسة رسم كبيرة": 6.50,
+            "كراسة رسم صغيرة": 3.50,
+            "ألوان خشب صغير": 9,
+            "ألوان خشب كبير": 13.50,
+            "مسطرة شفاف": 2,
+            "مسطرة صغيرة": 1.50,
+            "قلم سبورة روتو": 94,
+            "قلم جاف روتو (عبوة)": 38,
+            "قلم رصاص (عبوة)": 15,
+            "استيكة": 0.75,
+            "استيكة كبيرة": 1.25,
+            "براية صغيرة": 1.50,
+            "براية مستطيل": 3.50,
+            "قلم كوريكتور": 7,
+            "قلم مظهر": 25,
+            "صمغ روج كبير": 5.50,
+            "تكت": 1,
+            "جلاد كراسات (فيها 10 وحدات)": 11,
+            "طقم هندسي": 38.50,
+            "مقلمة أديداس": 8,
+            "مقلمة صنف ثاني": 13,
+            "مقلمة صنف ثالث": 14,
+            "شنطة": 150,
+            "شنطة نوع ثاني": 135,
+            "شنط درس": 25.50,
+            "لانش بوكس طقم (لانش بوكس + زمزمية)": 57,
+            "لانش بوكس فقط": 40,
+            "زمزمية": 25
+        };
+
+        function getUnitPrice(name) {
+            if (!name) return 0;
+            const cleanName = name.trim();
+            if (PRODUCT_PRICES[cleanName] !== undefined) return PRODUCT_PRICES[cleanName];
+            for (let key in PRODUCT_PRICES) {
+                if (cleanName.includes(key) || key.includes(cleanName)) {
+                    return PRODUCT_PRICES[key];
+                }
+            }
+            return 0;
+        }
+
+        let currentOrders = STORE_DATA.orders || [];
+
+        function init() {
+            document.getElementById('stat-orders').innerText = currentOrders.length;
+            const totalSales = currentOrders.reduce((acc, curr) => acc + (curr.total || 0), 0);
+            document.getElementById('stat-sales').innerText = totalSales.toLocaleString() + ' ج.م';
+
+            renderOrders(currentOrders);
+            renderProducts(STORE_DATA.products || []);
+        }
+
+        function renderOrders(data) {
+            const tbody = document.getElementById('orders-tbody');
+            tbody.innerHTML = data.map(o => {
+                const rawItems = o.order ? o.order.split(' | ').filter(Boolean) : [];
+                
+                const itemsList = rawItems.map(item => {
+                    const match = item.match(/(.*?)\s*\(عدد:\s*(\d+)\)/);
+                    return {
+                        name: match ? (match[1].strip ? match[1].strip() : match[1].trim()) : item,
+                        qty: match ? match[2] : '1'
+                    };
+                });
+
+                const noteText = o.notes || o.note || o.comment || "لا توجد ملاحظات إضافية على هذا الطلب.";
+
+                return `
+                <tr class="hover:bg-[#1F5F68]/20 transition-colors">
+                    <td class="p-4 font-bold text-slate-500">${o.id}</td>
+                    <td class="p-4 font-semibold text-[#D8A206]">#${o.order_number}</td>
+                    <td class="p-4 font-medium text-white">${o.name}</td>
+                    <td class="p-4 text-slate-300" dir="ltr">${o.phone}</td>
+                    <td class="p-4 text-slate-300 max-w-[180px] truncate" title="${o.address}">${o.address}</td>
+                    
+                    <!-- Hover Column: المنتجات المطلوبة -->
+                    <td class="p-4 relative group cursor-pointer">
+                        <div class="inline-flex items-center gap-1.5 bg-[#1F5F68]/40 border border-[#1F5F68] group-hover:bg-[#D8A206] group-hover:text-[#0E162B] text-slate-200 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm">
+                            <span>📦 ${itemsList.length} منتجات...</span>
+                        </div>
+
+                        <!-- Hover Card: تفاصيل المنتجات -->
+                        <div class="absolute right-0 top-full mt-1 hidden group-hover:flex flex-col gap-2 w-80 bg-[#0E162B] p-3 rounded-xl shadow-2xl border border-[#1F5F68] z-50">
+                            <div class="text-xs font-bold text-[#D8A206] border-b border-[#1F5F68] pb-1.5 flex justify-between items-center">
+                                <span>تفاصيل المنتجات</span>
+                                <span class="bg-[#1F5F68]/50 text-white px-2 py-0.5 rounded-full text-[10px]">${itemsList.length} أصناف</span>
+                            </div>
+                            
+                            <div class="space-y-1.5 max-h-64 overflow-y-auto pl-1">
+                                ${itemsList.map(item => `
+                                    <div class="flex justify-between items-center bg-[#131E3A] p-2 rounded-lg border border-[#1F5F68]/40">
+                                        <span class="font-bold text-slate-100 text-xs text-right leading-relaxed pl-2">${item.name}</span>
+                                        <span class="font-extrabold text-[#D8A206] bg-[#1F5F68]/60 px-2 py-0.5 rounded text-xs whitespace-nowrap">الكمية: ${item.qty}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Hover Column: الملاحظات (الجديد) -->
+                    <td class="p-4 relative group cursor-pointer">
+                        <div class="inline-flex items-center gap-1.5 bg-[#1F5F68]/30 border border-[#1F5F68]/60 group-hover:bg-[#1F5F68] group-hover:text-white text-slate-300 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm">
+                            <span>📝 ملاحظات...</span>
+                        </div>
+
+                        <!-- Hover Card: تفاصيل الملاحظة -->
+                        <div class="absolute right-0 top-full mt-1 hidden group-hover:flex flex-col gap-2 w-72 bg-[#0E162B] p-3.5 rounded-xl shadow-2xl border border-[#1F5F68] z-50">
+                            <div class="text-xs font-bold text-[#D8A206] border-b border-[#1F5F68] pb-1.5 flex items-center gap-1.5">
+                                <span>📝 ملاحظات الطلب</span>
+                            </div>
+                            <div class="bg-[#131E3A] p-3 rounded-lg border border-[#1F5F68]/40 text-xs text-slate-200 leading-relaxed font-medium">
+                                ${noteText}
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="p-4 font-extrabold text-[#D8A206]">${o.total} ج.م</td>
+                    <td class="p-4 text-xs text-slate-400 whitespace-nowrap">${o.order_date}</td>
+                    <td class="p-4 text-center">
+                        ${o['تم الطلب'] 
+                            ? '<span class="px-3 py-1 text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700 font-bold rounded-full">مكتمل 👍</span>' 
+                            : '<span class="px-3 py-1 text-xs bg-amber-950/80 text-amber-400 border border-amber-700 font-bold rounded-full">قيد الانتظار</span>'}
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function renderProducts(data) {
+            const tbody = document.getElementById('products-tbody');
+            let grandTotalPrice = 0;
+
+            tbody.innerHTML = data.map((p, idx) => {
+                const qty = Number(p.Quantity) || 0;
+                const unitPrice = getUnitPrice(p.product_name) || (p.price ? Number(p.price) : 0);
+                const totalPrice = qty * unitPrice;
+                grandTotalPrice += totalPrice;
+
+                return `
+                <tr class="hover:bg-[#1F5F68]/20 transition-colors">
+                    <td class="p-4 font-bold text-slate-500">${idx + 1}</td>
+                    <td class="p-4 font-bold text-white">${p.product_name}</td>
+                    <td class="p-4 text-center text-slate-300 font-medium">${unitPrice ? unitPrice.toLocaleString() + ' ج.م' : '-'}</td>
+                    <td class="p-4 text-center font-extrabold text-[#D8A206] text-base">${qty}</td>
+                    <!-- عمود إجمالي السعر (الكمية × السعر) -->
+                    <td class="p-4 text-center font-black text-emerald-400 text-base">${totalPrice ? totalPrice.toLocaleString() + ' ج.م' : '-'}</td>
+                </tr>
+            `}).join('');
+
+            // تحديث بطاقة إجمالي الأسعار الإجمالية
+            document.getElementById('stat-total-price').innerText = grandTotalPrice.toLocaleString() + ' ج.م';
+        }
+
+        function filterData() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            const filtered = currentOrders.filter(o => 
+                o.name.toLowerCase().includes(q) || 
+                o.phone.includes(q) || 
+                o.order_number.toString().includes(q)
+            );
+            renderOrders(filtered);
+        }
+
+        function switchTab(tab) {
+            const ordersView = document.getElementById('view-orders');
+            const productsView = document.getElementById('view-products');
+            const ordersBtn = document.getElementById('tab-orders-btn');
+            const productsBtn = document.getElementById('tab-products-btn');
+
+            if (tab === 'orders') {
+                ordersView.classList.remove('hidden');
+                productsView.classList.add('hidden');
+                ordersBtn.className = "px-5 py-2 rounded-md font-bold text-sm bg-[#D8A206] text-[#0E162B] transition-all shadow-md";
+                productsBtn.className = "px-5 py-2 rounded-md font-bold text-sm text-slate-300 hover:text-white transition-all";
+            } else {
+                ordersView.classList.add('hidden');
+                productsView.classList.remove('hidden');
+                productsBtn.className = "px-5 py-2 rounded-md font-bold text-sm bg-[#D8A206] text-[#0E162B] transition-all shadow-md";
+                ordersBtn.className = "px-5 py-2 rounded-md font-bold text-sm text-slate-300 hover:text-white transition-all";
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
