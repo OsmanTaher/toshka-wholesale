@@ -1,10 +1,14 @@
+function escapeMarkdownV2(value) {
+  return String(value).replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, "\\$1");
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
-    const orderData = req.body;
+    const orderData = req.body || {};
     const GOOGLE_SHEET_URL = process.env.GOOGLE_SHEET_URL;
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -13,6 +17,108 @@ export default async function handler(req, res) {
       return res
         .status(500)
         .json({ success: false, error: "Telegram settings are missing" });
+    }
+
+    const isQuickAction =
+      String(orderData.source || "").toLowerCase() === "quick-action";
+    const action = String(orderData.action || orderData.type || "")
+      .trim()
+      .toLowerCase();
+    const phone = String(orderData.phone || "").trim();
+    const orderNumber = String(
+      orderData.orderNumber || orderData.order_number || "",
+    ).trim();
+
+    if (isQuickAction) {
+      if (!["confirm", "cancel"].includes(action)) {
+        return res
+          .status(400)
+          .json({ success: false, error: "Invalid action" });
+      }
+
+      if (!phone || !orderNumber) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: "Phone and order number are required",
+          });
+      }
+
+      const label = action === "confirm" ? "تأكيد الطلب" : "إلغاء الطلب";
+      const telegramText = `🔔 *${label}*
+• رقم الهاتف: ${escapeMarkdownV2(phone)}
+• رقم الطلب: ${escapeMarkdownV2(orderNumber)}`;
+
+      const telegramResponse = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: telegramText,
+            parse_mode: "MarkdownV2",
+          }),
+        },
+      );
+
+      if (!telegramResponse.ok) {
+        const telegramError = await telegramResponse.text();
+        throw new Error(
+          `Telegram ${telegramResponse.status}: ${telegramError}`,
+        );
+      }
+
+      if (GOOGLE_SHEET_URL) {
+        const sheetPayload = {
+          action,
+          status: action === "confirm" ? "confirmed" : "cancelled",
+          phone,
+          orderNumber,
+          timestamp: new Date().toISOString(),
+          N: action === "confirm" ? phone : "",
+          O: action === "confirm" ? orderNumber : "",
+          Q: action === "cancel" ? phone : "",
+          R: action === "cancel" ? orderNumber : "",
+          n: action === "confirm" ? phone : "",
+          o: action === "confirm" ? orderNumber : "",
+          q: action === "cancel" ? phone : "",
+          r: action === "cancel" ? orderNumber : "",
+        };
+
+        const sheetResponse = await fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sheetPayload),
+        });
+
+        const sheetBody = await sheetResponse.text();
+        if (!sheetResponse.ok) {
+          throw new Error(
+            `Google Sheets ${sheetResponse.status}: ${sheetBody}`,
+          );
+        }
+
+        try {
+          const sheetResult = JSON.parse(sheetBody);
+          if (sheetResult.status === "error") {
+            throw new Error(
+              sheetResult.message || "Google Sheets rejected the action",
+            );
+          }
+        } catch (error) {
+          if (error instanceof SyntaxError) {
+            throw new Error("Google Sheets returned an invalid response");
+          }
+          throw error;
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `${label} sent successfully`,
+      });
     }
 
     if (

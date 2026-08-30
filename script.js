@@ -711,11 +711,109 @@ function closeAboutModal(event) {
   document.body.classList.remove("overflow-hidden");
 }
 
+function openQuickActionModal(action) {
+  const modal = document.getElementById("quickActionModal");
+  const typeInput = document.getElementById("quickActionType");
+  const title = document.getElementById("quickActionTitle");
+  const submitBtn = document.getElementById("quickActionSubmitBtn");
+  const phoneInput = document.getElementById("quickActionPhone");
+  const actionName = action === "cancel" ? "إلغاء الطلب" : "تأكيد الطلب";
+
+  typeInput.value = action;
+  title.textContent = actionName;
+  submitBtn.innerHTML = `
+    <i class="fa-solid ${action === "cancel" ? "fa-ban" : "fa-check"}"></i>
+    <span>${action === "cancel" ? "إلغاء" : "تأكيد"}</span>
+  `;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+  document.body.classList.add("overflow-hidden");
+  setTimeout(() => phoneInput.focus(), 50);
+}
+
+function closeQuickActionModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+
+  const modal = document.getElementById("quickActionModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  document.body.classList.remove("overflow-hidden");
+  document.getElementById("quickActionForm").reset();
+}
+
+async function submitQuickAction(event) {
+  event.preventDefault();
+
+  const action = document.getElementById("quickActionType").value;
+  const phone = document.getElementById("quickActionPhone").value.trim();
+  const orderNumber = document
+    .getElementById("quickActionOrderNumber")
+    .value.trim();
+
+  if (!/^01(0|1|2|5)\d{8}$/.test(phone)) {
+    showToast(
+      "أدخل رقم هاتف صحيحًا مكونًا من 11 رقمًا ويبدأ بـ 010 أو 011 أو 012 أو 015",
+      "error",
+    );
+    return;
+  }
+
+  if (!orderNumber) {
+    showToast("يرجى إدخال رقم الطلب", "error");
+    return;
+  }
+
+  const isSuccess = await sendQuickActionRequest({
+    action,
+    phone,
+    orderNumber,
+  });
+
+  if (!isSuccess) return;
+
+  showToast(
+    action === "cancel"
+      ? "تم إرسال طلب الإلغاء بنجاح"
+      : "تم إرسال تأكيد الطلب بنجاح",
+    "success",
+  );
+  closeQuickActionModal();
+}
+
+async function sendQuickActionRequest(payload) {
+  try {
+    const response = await fetch("/api/send-telegram", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        source: "quick-action",
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      console.error("Quick action API error:", result);
+      showToast(result.error || "تعذر تنفيذ العملية", "error");
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Quick action request failed:", error);
+    showToast("تعذر الاتصال بالسيرفر. تأكد من اتصال الإنترنت", "error");
+    return false;
+  }
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeImageModal();
     closeLocationModal();
     closeAboutModal();
+    closeQuickActionModal();
   }
 });
 
