@@ -600,47 +600,120 @@
           >
             <i class="fa-solid fa-circle-info"></i> اقرأ عنا
           </button>
-          <button
-            type="button"
-            onclick="openQuickActionModal('confirm')"
-            class="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-4 py-3 text-sm font-bold transition-colors"
-          >
-            <i class="fa-solid fa-check-circle"></i> تأكيد الطلب
-          </button>
-          <button
-            type="button"
-            onclick="openQuickActionModal('cancel')"
-            class="flex items-center justify-center gap-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 px-4 py-3 text-sm font-bold transition-colors"
-          >
-            <i class="fa-solid fa-ban"></i> إلغاء الطلب
-          </button>
-          <div
-            class="flex items-center justify-center gap-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold"
-          >
-            <a
-              href="https://www.facebook.com/ehab.bob.50"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="فيسبوك"
-              class="text-blue-600 text-2xl hover:scale-110 transition-transform"
-              ><i class="fa-brands fa-facebook" aria-hidden="true"></i
-            ></a>
-            <a
-              href="https://wa.me/201142047872"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="واتساب"
-              class="text-emerald-600 text-2xl hover:scale-110 transition-transform"
-              ><i class="fa-brands fa-whatsapp" aria-hidden="true"></i
-            ></a>
+
+          <div class="space-y-2">
+            <button
+              type="button"
+              data-action="confirm"
+              onclick="toggleQuickActionForm(this)"
+              class="w-full flex items-center justify-between gap-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-4 py-3 text-sm font-bold transition-colors"
+            >
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-check-circle"></i> تأكيد الطلب
+              </span>
+              <i
+                class="fa-solid fa-chevron-down text-xs transition-transform"
+              ></i>
+            </button>
+            <form
+              data-quick-form="confirm"
+              class="hidden overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 space-y-3"
+              onsubmit="submitQuickAction(event)"
+            >
+              <input type="hidden" name="action" value="confirm" />
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1"
+                  >رقم الهاتف</label
+                >
+                <input
+                  name="phone"
+                  type="tel"
+                  required
+                  pattern="01(0|1|2|5)[0-9]{8}"
+                  maxlength="11"
+                  placeholder="011xxxxxxxx"
+                  class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-left dir-ltr focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1"
+                  >رقم الطلب</label
+                >
+                <input
+                  name="orderNumber"
+                  type="text"
+                  required
+                  pattern="[0-9]{4}"
+                  maxlength="4"
+                  placeholder="1234"
+                  class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                />
+              </div>
+              <button
+                type="submit"
+                class="w-full rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 text-sm"
+              >
+                تأكيد
+              </button>
+            </form>
           </div>
-          <button
-            type="button"
-            onclick="openLocationModal()"
-            class="flex items-center justify-center gap-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 px-4 py-3 text-sm font-bold transition-colors"
-          >
-            <i class="fa-solid fa-location-dot"></i> موقعنا
-          </button>
+
+          <div class="space-y-2">
+            <button
+              type="button"
+              data-action="cancel"
+              onclick="toggleQuickActionForm(this)"
+              class="w-full flex items-center justify-between gap-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 px-4 py-3 text-sm font-bold transition-colors"
+            >
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-ban"></i> إلغاء الطلب
+              </span>
+              <i
+                class="fa-solid fa-chevron-down text-xs transition-transform"
+              ></i>
+            </button>
+            <form
+              data-quick-form="cancel"
+              class="hidden overflow-hidden rounded-xl border border-rose-200 bg-rose-50/80 p-3 space-y-3"
+              onsubmit="submitQuickAction(event)"
+            >
+              <input type="hidden" name="action" value="cancel" />
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1"
+                  >رقم الهاتف</label
+                >
+                <input
+                  name="phone"
+                  type="tel"
+                  required
+                  pattern="01(0|1|2|5)[0-9]{8}"
+                  maxlength="11"
+                  placeholder="011xxxxxxxx"
+                  class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-left dir-ltr focus:outline-none focus:ring-2 focus:ring-rose-200"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1"
+                  >رقم الطلب</label
+                >
+                <input
+                  name="orderNumber"
+                  type="text"
+                  required
+                  pattern="[0-9]{4}"
+                  maxlength="4"
+                  placeholder="1234"
+                  class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                />
+              </div>
+              <button
+                type="submit"
+                class="w-full rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 text-sm"
+              >
+                إلغاء
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </section>
@@ -727,83 +800,6 @@
         >
           حسناً، فهمت
         </button>
-      </div>
-    </div>
-
-    <div
-      id="quickActionModal"
-      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[70] hidden items-center justify-center p-4"
-      onclick="closeQuickActionModal(event)"
-    >
-      <div class="relative bg-white rounded-2xl p-5 shadow-2xl w-full max-w-md">
-        <button
-          type="button"
-          onclick="closeQuickActionModal()"
-          aria-label="إغلاق النافذة"
-          class="absolute -top-3 -left-3 w-10 h-10 rounded-full bg-white text-slate-800 shadow-lg flex items-center justify-center text-lg hover:bg-slate-100 transition-colors"
-        >
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-
-        <h2
-          id="quickActionTitle"
-          class="text-xl font-extrabold text-slate-900 mb-5 text-center"
-        >
-          تأكيد الطلب
-        </h2>
-
-        <form
-          id="quickActionForm"
-          onsubmit="submitQuickAction(event)"
-          class="space-y-4"
-        >
-          <input id="quickActionType" type="hidden" value="confirm" />
-
-          <div>
-            <label
-              for="quickActionPhone"
-              class="block text-xs font-medium text-slate-700 mb-1"
-            >
-              رقم الهاتف <span class="text-red-500">*</span>
-            </label>
-            <input
-              id="quickActionPhone"
-              type="tel"
-              required
-              minlength="11"
-              maxlength="11"
-              pattern="01(0|1|2|5)[0-9]{8}"
-              inputmode="numeric"
-              placeholder="011xxxxxxxx"
-              class="w-full pr-3 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left dir-ltr"
-            />
-          </div>
-
-          <div>
-            <label
-              for="quickActionOrderNumber"
-              class="block text-xs font-medium text-slate-700 mb-1"
-            >
-              رقم الطلب <span class="text-red-500">*</span>
-            </label>
-            <input
-              id="quickActionOrderNumber"
-              type="text"
-              required
-              placeholder="مثال: 1234"
-              class="w-full pr-3 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-            />
-          </div>
-
-          <button
-            id="quickActionSubmitBtn"
-            type="submit"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-          >
-            <i class="fa-solid fa-check"></i>
-            <span>تأكيد</span>
-          </button>
-        </form>
       </div>
     </div>
 

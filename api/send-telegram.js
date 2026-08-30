@@ -10,6 +10,10 @@ export default async function handler(req, res) {
   try {
     const orderData = req.body || {};
     const GOOGLE_SHEET_URL = process.env.GOOGLE_SHEET_URL;
+    const GOOGLE_SHEET_URL_CONFIRM =
+      process.env.GOOGLE_SHEET_URL_CONFIRM || GOOGLE_SHEET_URL;
+    const GOOGLE_SHEET_URL_CANCEL =
+      process.env.GOOGLE_SHEET_URL_CANCEL || GOOGLE_SHEET_URL;
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -36,12 +40,12 @@ export default async function handler(req, res) {
           .json({ success: false, error: "Invalid action" });
       }
 
-      if (!phone || !orderNumber) {
+      if (!/^01(0|1|2|5)\d{8}$/.test(phone) || !/^\d{4}$/.test(orderNumber)) {
         return res
           .status(400)
           .json({
             success: false,
-            error: "Phone and order number are required",
+            error: "Phone must be 11 digits and order number must be 4 digits",
           });
       }
 
@@ -70,24 +74,24 @@ export default async function handler(req, res) {
         );
       }
 
-      if (GOOGLE_SHEET_URL) {
+      const targetSheetUrl =
+        action === "confirm"
+          ? GOOGLE_SHEET_URL_CONFIRM
+          : GOOGLE_SHEET_URL_CANCEL;
+
+      if (targetSheetUrl) {
         const sheetPayload = {
           action,
           status: action === "confirm" ? "confirmed" : "cancelled",
           phone,
           orderNumber,
           timestamp: new Date().toISOString(),
-          N: action === "confirm" ? phone : "",
-          O: action === "confirm" ? orderNumber : "",
-          Q: action === "cancel" ? phone : "",
-          R: action === "cancel" ? orderNumber : "",
-          n: action === "confirm" ? phone : "",
-          o: action === "confirm" ? orderNumber : "",
-          q: action === "cancel" ? phone : "",
-          r: action === "cancel" ? orderNumber : "",
+          ...(action === "confirm"
+            ? { N: phone, O: orderNumber }
+            : { Q: phone, R: orderNumber }),
         };
 
-        const sheetResponse = await fetch(GOOGLE_SHEET_URL, {
+        const sheetResponse = await fetch(targetSheetUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(sheetPayload),

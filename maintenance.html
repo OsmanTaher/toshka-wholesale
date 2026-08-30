@@ -168,246 +168,303 @@
       <div
         style="display: grid; gap: 12px; margin: 20px auto 0; max-width: 360px"
       >
-        <button
-          type="button"
-          onclick="openQuickActionModal('confirm')"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: none;
-            border-radius: 12px;
-            background: #dcfce7;
-            color: #166534;
-            font-weight: 800;
-            font-size: 15px;
-            padding: 12px 14px;
-            cursor: pointer;
-          "
-        >
-          <span>✓</span>
-          <span>تأكيد الطلب</span>
-        </button>
-        <button
-          type="button"
-          onclick="openQuickActionModal('cancel')"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: none;
-            border-radius: 12px;
-            background: #fee2e2;
-            color: #991b1b;
-            font-weight: 800;
-            font-size: 15px;
-            padding: 12px 14px;
-            cursor: pointer;
-          "
-        >
-          <span>✕</span>
-          <span>إلغاء الطلب</span>
-        </button>
-      </div>
-
-      <span class="note" style="margin-top: 24px">سنعود قريباً بإذن الله</span>
-      <p class="footer">نشكركم على زيارتكم</p>
-    </div>
-
-    <div
-      id="quickActionModal"
-      style="
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.72);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-        z-index: 50;
-      "
-    >
-      <div
-        style="
-          position: relative;
-          width: min(100%, 420px);
-          background: white;
-          border-radius: 22px;
-          box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
-          padding: 24px 20px 18px;
-        "
-      >
-        <button
-          type="button"
-          onclick="closeQuickActionModal()"
-          aria-label="إغلاق النافذة"
-          style="
-            position: absolute;
-            top: -14px;
-            left: -12px;
-            width: 38px;
-            height: 38px;
-            border: none;
-            border-radius: 50%;
-            background: white;
-            color: #0f172a;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
-            font-size: 18px;
-            cursor: pointer;
-          "
-        >
-          ×
-        </button>
-
-        <h2
-          id="quickActionTitle"
-          style="
-            margin: 0 0 16px;
-            font-size: 24px;
-            color: #0f172a;
-            text-align: center;
-          "
-        >
-          تأكيد الطلب
-        </h2>
-
-        <form
-          id="quickActionForm"
-          onsubmit="submitQuickAction(event)"
-          style="display: grid; gap: 14px"
-        >
-          <input id="quickActionType" type="hidden" value="confirm" />
-
-          <div>
-            <label
-              for="quickActionPhone"
-              style="
-                display: block;
-                margin-bottom: 6px;
-                color: #334155;
-                font-size: 13px;
-                font-weight: 700;
-              "
-            >
-              رقم الهاتف <span style="color: #ef4444">*</span>
-            </label>
-            <input
-              id="quickActionPhone"
-              type="tel"
-              required
-              minlength="11"
-              maxlength="11"
-              pattern="01(0|1|2|5)[0-9]{8}"
-              inputmode="numeric"
-              placeholder="011xxxxxxxx"
-              style="
-                width: 100%;
-                padding: 12px 14px;
-                border-radius: 12px;
-                border: 1px solid #dbe2ea;
-                background: #f8fafc;
-                font-size: 15px;
-                text-align: left;
-                direction: ltr;
-              "
-            />
-          </div>
-
-          <div>
-            <label
-              for="quickActionOrderNumber"
-              style="
-                display: block;
-                margin-bottom: 6px;
-                color: #334155;
-                font-size: 13px;
-                font-weight: 700;
-              "
-            >
-              رقم الطلب <span style="color: #ef4444">*</span>
-            </label>
-            <input
-              id="quickActionOrderNumber"
-              type="text"
-              required
-              placeholder="مثال: 1234"
-              style="
-                width: 100%;
-                padding: 12px 14px;
-                border-radius: 12px;
-                border: 1px solid #dbe2ea;
-                background: #f8fafc;
-                font-size: 15px;
-                text-align: right;
-              "
-            />
-          </div>
-
+        <div style="display: grid; gap: 10px">
           <button
-            id="quickActionSubmitBtn"
-            type="submit"
+            type="button"
+            data-action="confirm"
+            onclick="toggleQuickActionForm(this)"
             style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 8px;
               border: none;
               border-radius: 12px;
-              background: #4f46e5;
-              color: white;
+              background: #dcfce7;
+              color: #166534;
               font-weight: 800;
               font-size: 15px;
               padding: 12px 14px;
               cursor: pointer;
             "
           >
-            تأكيد
+            <span style="display: inline-flex; align-items: center; gap: 8px">
+              <span>✓</span>
+              <span>تأكيد الطلب</span>
+            </span>
+            <span
+              class="chevron"
+              style="font-size: 12px; transition: transform 0.2s"
+              >›</span
+            >
           </button>
-        </form>
+          <form
+            data-quick-form="confirm"
+            onsubmit="submitQuickAction(event)"
+            style="
+              display: none;
+              gap: 12px;
+              background: rgba(220, 252, 231, 0.8);
+              border: 1px solid #bbf7d0;
+              border-radius: 12px;
+              padding: 12px;
+            "
+          >
+            <input type="hidden" name="action" value="confirm" />
+            <div>
+              <label
+                style="
+                  display: block;
+                  margin-bottom: 6px;
+                  color: #334155;
+                  font-size: 12px;
+                  font-weight: 700;
+                "
+                >رقم الهاتف</label
+              >
+              <input
+                name="phone"
+                type="tel"
+                required
+                pattern="01(0|1|2|5)[0-9]{8}"
+                maxlength="11"
+                placeholder="011xxxxxxxx"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  border: 1px solid #dbe2ea;
+                  background: #fff;
+                  font-size: 14px;
+                  text-align: left;
+                  direction: ltr;
+                "
+              />
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  margin-bottom: 6px;
+                  color: #334155;
+                  font-size: 12px;
+                  font-weight: 700;
+                "
+                >رقم الطلب</label
+              >
+              <input
+                name="orderNumber"
+                type="text"
+                required
+                pattern="[0-9]{4}"
+                maxlength="4"
+                placeholder="1234"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  border: 1px solid #dbe2ea;
+                  background: #fff;
+                  font-size: 14px;
+                  text-align: right;
+                "
+              />
+            </div>
+            <button
+              type="submit"
+              style="
+                width: 100%;
+                border: none;
+                border-radius: 10px;
+                background: #16a34a;
+                color: #fff;
+                font-weight: 800;
+                font-size: 14px;
+                padding: 10px 12px;
+                cursor: pointer;
+              "
+            >
+              تأكيد
+            </button>
+          </form>
+        </div>
+
+        <div style="display: grid; gap: 10px">
+          <button
+            type="button"
+            data-action="cancel"
+            onclick="toggleQuickActionForm(this)"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 8px;
+              border: none;
+              border-radius: 12px;
+              background: #fee2e2;
+              color: #991b1b;
+              font-weight: 800;
+              font-size: 15px;
+              padding: 12px 14px;
+              cursor: pointer;
+            "
+          >
+            <span style="display: inline-flex; align-items: center; gap: 8px">
+              <span>✕</span>
+              <span>إلغاء الطلب</span>
+            </span>
+            <span
+              class="chevron"
+              style="font-size: 12px; transition: transform 0.2s"
+              >›</span
+            >
+          </button>
+          <form
+            data-quick-form="cancel"
+            onsubmit="submitQuickAction(event)"
+            style="
+              display: none;
+              gap: 12px;
+              background: rgba(254, 226, 226, 0.8);
+              border: 1px solid #fecaca;
+              border-radius: 12px;
+              padding: 12px;
+            "
+          >
+            <input type="hidden" name="action" value="cancel" />
+            <div>
+              <label
+                style="
+                  display: block;
+                  margin-bottom: 6px;
+                  color: #334155;
+                  font-size: 12px;
+                  font-weight: 700;
+                "
+                >رقم الهاتف</label
+              >
+              <input
+                name="phone"
+                type="tel"
+                required
+                pattern="01(0|1|2|5)[0-9]{8}"
+                maxlength="11"
+                placeholder="011xxxxxxxx"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  border: 1px solid #dbe2ea;
+                  background: #fff;
+                  font-size: 14px;
+                  text-align: left;
+                  direction: ltr;
+                "
+              />
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  margin-bottom: 6px;
+                  color: #334155;
+                  font-size: 12px;
+                  font-weight: 700;
+                "
+                >رقم الطلب</label
+              >
+              <input
+                name="orderNumber"
+                type="text"
+                required
+                pattern="[0-9]{4}"
+                maxlength="4"
+                placeholder="1234"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  border: 1px solid #dbe2ea;
+                  background: #fff;
+                  font-size: 14px;
+                  text-align: right;
+                "
+              />
+            </div>
+            <button
+              type="submit"
+              style="
+                width: 100%;
+                border: none;
+                border-radius: 10px;
+                background: #dc2626;
+                color: #fff;
+                font-weight: 800;
+                font-size: 14px;
+                padding: 10px 12px;
+                cursor: pointer;
+              "
+            >
+              إلغاء
+            </button>
+          </form>
+        </div>
       </div>
+
+      <span class="note" style="margin-top: 24px">سنعود قريباً بإذن الله</span>
+      <p class="footer">نشكركم على زيارتكم</p>
     </div>
 
     <script>
-      function openQuickActionModal(action) {
-        const modal = document.getElementById("quickActionModal");
-        const typeInput = document.getElementById("quickActionType");
-        const title = document.getElementById("quickActionTitle");
-        const submitBtn = document.getElementById("quickActionSubmitBtn");
-        const actionName = action === "cancel" ? "إلغاء الطلب" : "تأكيد الطلب";
+      function toggleQuickActionForm(button) {
+        const action = button.dataset.action;
+        const form = document.querySelector(`[data-quick-form="${action}"]`);
+        const chevron = button.querySelector(".chevron");
 
-        typeInput.value = action;
-        title.textContent = actionName;
-        submitBtn.textContent = action === "cancel" ? "إلغاء" : "تأكيد";
-        submitBtn.style.background =
-          action === "cancel" ? "#ef4444" : "#4f46e5";
-        modal.style.display = "flex";
-        setTimeout(
-          () => document.getElementById("quickActionPhone").focus(),
-          50,
-        );
-      }
+        if (!form) return;
 
-      function closeQuickActionModal() {
-        document.getElementById("quickActionModal").style.display = "none";
-        document.getElementById("quickActionForm").reset();
+        const isOpen =
+          form.style.display !== "none" && form.style.display !== "";
+        document.querySelectorAll("[data-quick-form]").forEach((panel) => {
+          panel.style.display = "none";
+          const relatedButton = document.querySelector(
+            `[data-action="${panel.dataset.quickForm}"]`,
+          );
+          const relatedChevron = relatedButton?.querySelector(".chevron");
+          if (relatedChevron) relatedChevron.style.transform = "rotate(0deg)";
+        });
+
+        if (isOpen) {
+          form.style.display = "none";
+          if (chevron) chevron.style.transform = "rotate(0deg)";
+          return;
+        }
+
+        form.style.display = "grid";
+        if (chevron) chevron.style.transform = "rotate(90deg)";
+        const firstInput = form.querySelector("input[name='phone']");
+        if (firstInput) setTimeout(() => firstInput.focus(), 80);
       }
 
       async function submitQuickAction(event) {
         event.preventDefault();
-
-        const action = document.getElementById("quickActionType").value;
-        const phone = document.getElementById("quickActionPhone").value.trim();
-        const orderNumber = document
-          .getElementById("quickActionOrderNumber")
+        const form = event.currentTarget;
+        const action = form.querySelector('input[name="action"]').value;
+        const phone = form.querySelector('input[name="phone"]').value.trim();
+        const orderNumber = form
+          .querySelector('input[name="orderNumber"]')
           .value.trim();
 
         if (!/^01(0|1|2|5)\d{8}$/.test(phone)) {
-          alert(
+          showToast(
             "أدخل رقم هاتف صحيحًا مكونًا من 11 رقمًا ويبدأ بـ 010 أو 011 أو 012 أو 015",
+            "error",
           );
           return;
         }
 
-        if (!orderNumber) {
-          alert("يرجى إدخال رقم الطلب");
+        if (!/^\d{4}$/.test(orderNumber)) {
+          showToast("يرجى إدخال رقم الطلب بشكل صحيح (4 أرقام فقط)", "error");
           return;
         }
 
@@ -428,16 +485,80 @@
             throw new Error(result.error || "تعذر تنفيذ العملية");
           }
 
-          alert(
+          form.reset();
+          form.style.display = "none";
+          showToast(
             action === "cancel"
               ? "تم إرسال طلب الإلغاء بنجاح"
               : "تم إرسال تأكيد الطلب بنجاح",
+            "success",
           );
-          closeQuickActionModal();
         } catch (error) {
-          alert(error.message || "تعذر تنفيذ العملية");
+          showToast(error.message || "تعذر تنفيذ العملية", "error");
         }
       }
+
+      function showToast(message, type = "info") {
+        const container = document.getElementById("toastContainer");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        const bgColor =
+          type === "error"
+            ? "background: #e11d48;"
+            : type === "success"
+              ? "background: #16a34a;"
+              : "background: #0f172a;";
+        const icon = type === "error" ? "⚠" : type === "success" ? "✓" : "ℹ";
+
+        toast.style.cssText = `
+          pointer-events: auto;
+          color: white;
+          border-radius: 12px;
+          box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          max-width: 320px;
+          padding: 12px 14px;
+          font-size: 13px;
+          font-weight: 700;
+          opacity: 0;
+          transform: translateY(8px);
+          transition: all 0.3s ease;
+          ${bgColor}
+        `;
+
+        toast.innerHTML = `
+          <span style="font-size: 15px;">${icon}</span>
+          <span style="flex: 1; line-height: 1.5;">${message}</span>
+        `;
+
+        container.appendChild(toast);
+        requestAnimationFrame(() => {
+          toast.style.opacity = "1";
+          toast.style.transform = "translateY(0)";
+        });
+
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translateY(8px)";
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
     </script>
+    <div
+      id="toastContainer"
+      style="
+        position: fixed;
+        left: 18px;
+        bottom: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+        pointer-events: none;
+      "
+    ></div>
   </body>
 </html>

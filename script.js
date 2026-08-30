@@ -659,13 +659,6 @@ function closeSuccessModal() {
   document.getElementById("successModal").classList.add("hidden");
 }
 
-function openLocationModal() {
-  const modal = document.getElementById("locationModal");
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-  document.body.classList.add("overflow-hidden");
-}
-
 function closeLocationModal(event) {
   if (event && event.target !== event.currentTarget) return;
 
@@ -711,44 +704,45 @@ function closeAboutModal(event) {
   document.body.classList.remove("overflow-hidden");
 }
 
-function openQuickActionModal(action) {
-  const modal = document.getElementById("quickActionModal");
-  const typeInput = document.getElementById("quickActionType");
-  const title = document.getElementById("quickActionTitle");
-  const submitBtn = document.getElementById("quickActionSubmitBtn");
-  const phoneInput = document.getElementById("quickActionPhone");
-  const actionName = action === "cancel" ? "إلغاء الطلب" : "تأكيد الطلب";
+function toggleQuickActionForm(button) {
+  const action = button.dataset.action;
+  const form = document.querySelector(`[data-quick-form="${action}"]`);
+  const icon = button.querySelector(".fa-chevron-down");
 
-  typeInput.value = action;
-  title.textContent = actionName;
-  submitBtn.innerHTML = `
-    <i class="fa-solid ${action === "cancel" ? "fa-ban" : "fa-check"}"></i>
-    <span>${action === "cancel" ? "إلغاء" : "تأكيد"}</span>
-  `;
+  if (!form) return;
 
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-  document.body.classList.add("overflow-hidden");
-  setTimeout(() => phoneInput.focus(), 50);
-}
+  const isOpen = !form.classList.contains("hidden");
+  document.querySelectorAll("[data-quick-form]").forEach((panel) => {
+    panel.classList.add("hidden");
+    const trigger = document.querySelector(
+      `[data-action="${panel.dataset.quickForm}"]`,
+    );
+    if (trigger) {
+      const triggerIcon = trigger.querySelector(".fa-chevron-down");
+      if (triggerIcon) triggerIcon.classList.remove("rotate-180");
+    }
+  });
 
-function closeQuickActionModal(event) {
-  if (event && event.target !== event.currentTarget) return;
+  if (isOpen) {
+    form.classList.add("hidden");
+    if (icon) icon.classList.remove("rotate-180");
+    return;
+  }
 
-  const modal = document.getElementById("quickActionModal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-  document.body.classList.remove("overflow-hidden");
-  document.getElementById("quickActionForm").reset();
+  form.classList.remove("hidden");
+  if (icon) icon.classList.add("rotate-180");
+  const firstField = form.querySelector("input[name='phone']");
+  if (firstField) setTimeout(() => firstField.focus(), 80);
 }
 
 async function submitQuickAction(event) {
   event.preventDefault();
 
-  const action = document.getElementById("quickActionType").value;
-  const phone = document.getElementById("quickActionPhone").value.trim();
-  const orderNumber = document
-    .getElementById("quickActionOrderNumber")
+  const form = event.currentTarget;
+  const action = form.querySelector('input[name="action"]').value;
+  const phone = form.querySelector('input[name="phone"]').value.trim();
+  const orderNumber = form
+    .querySelector('input[name="orderNumber"]')
     .value.trim();
 
   if (!/^01(0|1|2|5)\d{8}$/.test(phone)) {
@@ -759,8 +753,8 @@ async function submitQuickAction(event) {
     return;
   }
 
-  if (!orderNumber) {
-    showToast("يرجى إدخال رقم الطلب", "error");
+  if (!/^\d{4}$/.test(orderNumber)) {
+    showToast("يرجى إدخال رقم الطلب بشكل صحيح (4 أرقام فقط)", "error");
     return;
   }
 
@@ -772,13 +766,18 @@ async function submitQuickAction(event) {
 
   if (!isSuccess) return;
 
+  form.reset();
+  form.classList.add("hidden");
+  const triggerButton = document.querySelector(`[data-action="${action}"]`);
+  const triggerIcon = triggerButton?.querySelector(".fa-chevron-down");
+  if (triggerIcon) triggerIcon.classList.remove("rotate-180");
+
   showToast(
     action === "cancel"
       ? "تم إرسال طلب الإلغاء بنجاح"
       : "تم إرسال تأكيد الطلب بنجاح",
     "success",
   );
-  closeQuickActionModal();
 }
 
 async function sendQuickActionRequest(payload) {
@@ -813,7 +812,14 @@ document.addEventListener("keydown", (event) => {
     closeImageModal();
     closeLocationModal();
     closeAboutModal();
-    closeQuickActionModal();
+    document.querySelectorAll("[data-quick-form]").forEach((form) => {
+      form.classList.add("hidden");
+      const trigger = document.querySelector(
+        `[data-action="${form.dataset.quickForm}"]`,
+      );
+      const icon = trigger?.querySelector(".fa-chevron-down");
+      if (icon) icon.classList.remove("rotate-180");
+    });
   }
 });
 
