@@ -449,6 +449,7 @@
       async function submitQuickAction(event) {
         event.preventDefault();
         const form = event.currentTarget;
+        const submitButton = form.querySelector('button[type="submit"]');
         const action = form.querySelector('input[name="action"]').value;
         const phone = form.querySelector('input[name="phone"]').value.trim();
         const orderNumber = form
@@ -468,6 +469,15 @@
           return;
         }
 
+        if (form.dataset.submitting === "true") return;
+
+        form.dataset.submitting = "true";
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.style.opacity = "0.6";
+          submitButton.style.cursor = "not-allowed";
+        }
+
         try {
           const response = await fetch("/api/send-telegram", {
             method: "POST",
@@ -485,8 +495,6 @@
             throw new Error(result.error || "تعذر تنفيذ العملية");
           }
 
-          form.reset();
-          form.style.display = "none";
           showToast(
             action === "cancel"
               ? "تم إرسال طلب الإلغاء بنجاح"
@@ -495,6 +503,12 @@
           );
         } catch (error) {
           showToast(error.message || "تعذر تنفيذ العملية", "error");
+          form.dataset.submitting = "false";
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.style.opacity = "1";
+            submitButton.style.cursor = "pointer";
+          }
         }
       }
 

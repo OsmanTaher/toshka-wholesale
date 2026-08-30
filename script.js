@@ -739,6 +739,7 @@ async function submitQuickAction(event) {
   event.preventDefault();
 
   const form = event.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]');
   const action = form.querySelector('input[name="action"]').value;
   const phone = form.querySelector('input[name="phone"]').value.trim();
   const orderNumber = form
@@ -758,19 +759,28 @@ async function submitQuickAction(event) {
     return;
   }
 
+  if (form.dataset.submitting === "true") return;
+
+  form.dataset.submitting = "true";
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.classList.add("opacity-60", "cursor-not-allowed");
+  }
+
   const isSuccess = await sendQuickActionRequest({
     action,
     phone,
     orderNumber,
   });
 
-  if (!isSuccess) return;
-
-  form.reset();
-  form.classList.add("hidden");
-  const triggerButton = document.querySelector(`[data-action="${action}"]`);
-  const triggerIcon = triggerButton?.querySelector(".fa-chevron-down");
-  if (triggerIcon) triggerIcon.classList.remove("rotate-180");
+  if (!isSuccess) {
+    form.dataset.submitting = "false";
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.classList.remove("opacity-60", "cursor-not-allowed");
+    }
+    return;
+  }
 
   showToast(
     action === "cancel"

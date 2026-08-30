@@ -74,51 +74,6 @@ export default async function handler(req, res) {
         );
       }
 
-      const targetSheetUrl =
-        action === "confirm"
-          ? GOOGLE_SHEET_URL_CONFIRM
-          : GOOGLE_SHEET_URL_CANCEL;
-
-      if (targetSheetUrl) {
-        const sheetPayload = {
-          action,
-          status: action === "confirm" ? "confirmed" : "cancelled",
-          phone,
-          orderNumber,
-          timestamp: new Date().toISOString(),
-          ...(action === "confirm"
-            ? { N: phone, O: orderNumber }
-            : { Q: phone, R: orderNumber }),
-        };
-
-        const sheetResponse = await fetch(targetSheetUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sheetPayload),
-        });
-
-        const sheetBody = await sheetResponse.text();
-        if (!sheetResponse.ok) {
-          throw new Error(
-            `Google Sheets ${sheetResponse.status}: ${sheetBody}`,
-          );
-        }
-
-        try {
-          const sheetResult = JSON.parse(sheetBody);
-          if (sheetResult.status === "error") {
-            throw new Error(
-              sheetResult.message || "Google Sheets rejected the action",
-            );
-          }
-        } catch (error) {
-          if (error instanceof SyntaxError) {
-            throw new Error("Google Sheets returned an invalid response");
-          }
-          throw error;
-        }
-      }
-
       return res.status(200).json({
         success: true,
         message: `${label} sent successfully`,
