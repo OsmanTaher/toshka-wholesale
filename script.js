@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<p class="sm:col-span-2 text-center text-rose-600 py-10">تعذر تحميل المنتجات حاليًا.</p>';
   }
 
+  updateDeliveryState();
   updateScrollProgress();
   window.addEventListener("scroll", updateScrollProgress, {
     passive: true,
@@ -395,6 +396,55 @@ function changeQty(productId, delta) {
   updateCartUI();
 }
 
+function getCurrentDeliveryFee() {
+  const pickupToggle = document.getElementById("pickupFromAssociation");
+  return pickupToggle && pickupToggle.checked ? 0 : DELIVERY_FEE;
+}
+
+function updateDeliveryState() {
+  const pickupToggle = document.getElementById("pickupFromAssociation");
+  const addressWrapper = document.getElementById("addressFieldWrapper");
+  const shippingFeeRow = document.getElementById("shippingFeeRow");
+  const shippingFeeValue = document.getElementById("shippingFeeValue");
+  const addressInput = document.getElementById("customerAddress");
+  const isPickup = Boolean(pickupToggle?.checked);
+  const deliveryFee = getCurrentDeliveryFee();
+
+  if (addressInput) {
+    addressInput.required = !isPickup;
+    addressInput.disabled = isPickup;
+    addressInput.setAttribute("aria-hidden", isPickup ? "true" : "false");
+    if (isPickup) {
+      addressInput.value = "";
+    }
+  }
+
+  if (addressWrapper) {
+    addressWrapper.classList.toggle("max-h-0", isPickup);
+    addressWrapper.classList.toggle("opacity-0", isPickup);
+    addressWrapper.classList.toggle("pointer-events-none", isPickup);
+    addressWrapper.classList.toggle("max-h-28", !isPickup);
+    addressWrapper.classList.toggle("opacity-100", !isPickup);
+  }
+
+  if (shippingFeeRow) {
+    shippingFeeRow.classList.toggle("max-h-0", isPickup);
+    shippingFeeRow.classList.toggle("opacity-0", isPickup);
+    shippingFeeRow.classList.toggle("pointer-events-none", isPickup);
+    shippingFeeRow.classList.toggle("max-h-20", !isPickup);
+    shippingFeeRow.classList.toggle("opacity-100", !isPickup);
+  }
+
+  if (shippingFeeValue) {
+    shippingFeeValue.innerText = `${deliveryFee.toFixed(2)} ج.م`;
+  }
+}
+
+function togglePickupMode() {
+  updateDeliveryState();
+  updateCartUI();
+}
+
 function updateCartUI() {
   let subtotal = 0;
   let totalItemsCount = 0;
@@ -439,13 +489,14 @@ function updateCartUI() {
       .join("");
   }
 
-  // Update Prices Breakdown
-  const grandTotal = subtotal > 0 ? subtotal + DELIVERY_FEE : DELIVERY_FEE;
+  const deliveryFee = getCurrentDeliveryFee();
+  const grandTotal = subtotal > 0 ? subtotal + deliveryFee : deliveryFee;
 
   document.getElementById("subtotalPrice").innerText =
     `${subtotal.toFixed(2)} ج`;
   document.getElementById("totalPrice").innerText =
     `${grandTotal.toFixed(2)} ج`;
+  updateDeliveryState();
 }
 
 async function handleOrderSubmit(event) {
@@ -459,7 +510,9 @@ async function handleOrderSubmit(event) {
 
   const name = document.getElementById("customerName").value.trim();
   const phone = document.getElementById("customerPhone").value.trim();
-  const address = document.getElementById("customerAddress").value.trim();
+  const pickupMode = document.getElementById("pickupFromAssociation")?.checked;
+  const addressInput = document.getElementById("customerAddress");
+  const address = pickupMode ? "استلام من الجمعية" : addressInput.value.trim();
   const notes = document.getElementById("customerNotes").value.trim();
 
   if (!/^01(0|1|2|5)\d{8}$/.test(phone)) {
@@ -467,6 +520,12 @@ async function handleOrderSubmit(event) {
       "أدخل رقم هاتف صحيحًا مكونًا من 11 رقمًا ويبدأ بـ 010 أو 011 أو 012 أو 015",
       "error",
     );
+    return;
+  }
+
+  if (!pickupMode && !address) {
+    showToast("يرجى إدخال عنوان التوصيل", "error");
+    addressInput.focus();
     return;
   }
 
@@ -488,7 +547,8 @@ async function handleOrderSubmit(event) {
     itemsText += `${index + 1}\\. *${escapeMarkdownV2(product.name)}*\n    └ الكمية: ${qty} \\| السعر: ${escapeMarkdownV2(itemTotal.toFixed(2))} ج\n`;
   });
 
-  const grandTotal = subtotal + DELIVERY_FEE;
+  const deliveryFee = pickupMode ? 0 : DELIVERY_FEE;
+  const grandTotal = subtotal + deliveryFee;
   const currentDate = new Date().toLocaleString("ar-SA");
 
   const message = `🛍️ *طلب جديد \\- جملة توشكى*
@@ -501,6 +561,7 @@ async function handleOrderSubmit(event) {
 
 • *الهاتف:* \`${escapeMarkdownV2(phone)}\`
 
+• *طريقة الاستلام:* ${pickupMode ? "استلام من الجمعية" : "توصيل منزلي"}
 • *العنوان:* ${escapeMarkdownV2(address)}
 ${notes ? `• *ملاحظات:* ${escapeMarkdownV2(notes)}\n` : ""}
 
@@ -509,7 +570,7 @@ ${itemsText}
 
 💵 *الفاتورة المالية:*
 • *مجموع المنتجات:* ${escapeMarkdownV2(subtotal.toFixed(2))} جنيه
-• *خدمة التوصيل:* ${escapeMarkdownV2(DELIVERY_FEE)} جنيه
+• *خدمة التوصيل:* ${escapeMarkdownV2(deliveryFee)} جنيه
 
 ✨ *الإجمالي المطلوب سداده:* \`${escapeMarkdownV2(grandTotal.toFixed(2))} جنيه\`
 
@@ -535,7 +596,8 @@ ${itemsText}
     phone,
     address,
     notes,
-    deliveryFee: DELIVERY_FEE,
+    deliveryFee,
+    pickupFromAssociation: pickupMode,
     cart: orderItems,
   });
 
@@ -546,6 +608,7 @@ ${itemsText}
     // Reset Form and Cart
     cart = {};
     document.getElementById("orderForm").reset();
+    updateDeliveryState();
     renderProducts();
     updateCartUI();
 
